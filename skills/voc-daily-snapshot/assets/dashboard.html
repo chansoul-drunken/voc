@@ -242,6 +242,10 @@
   }
   .period-toggle button.active{background:var(--ink);color:var(--c-bg);border-color:var(--ink);}
   .chart-wrap{height:280px;width:100%;position:relative;}
+  /* Chart.js가 차단된 환경에서 캔버스 자리를 대신한다 — 페이지가 백지가 되는 것보다 낫다 */
+  .chart-fallback{display:grid;place-items:center;min-height:140px;padding:20px;
+    border:1px dashed var(--c-border);border-radius:var(--radius);
+    color:var(--c-fg-3);font-size:12.5px;text-align:center;line-height:1.6;}
   .two-charts{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;margin-bottom:24px;}
   .donut-wrap{height:220px;width:100%;position:relative;display:flex;align-items:center;justify-content:center;}
   .donut-legend{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
@@ -588,9 +592,26 @@
 </div>
 
 <script>
-// Chart.js 기본 폰트를 본문과 동일한 Pretendard로 맞춤 — 안 하면 캔버스 텍스트만 시스템 기본 폰트로 어긋나 보임
-Chart.defaults.font.family = "'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
-Chart.defaults.color = 'rgba(240,232,210,0.58)';
+// Chart.js가 CDN에서 못 올라오는 환경(사내망 차단, htmlpreview 같은 프록시 뷰어)이 있다.
+// 예전에는 아래 Chart.defaults 대입이 그 자리에서 던져서 스크립트 전체가 죽었고,
+// 그래프뿐 아니라 KPI·원문 리스트·랭킹까지 전부 백지가 됐다. 그래프는 부가물이지 본체가 아니다.
+const HAS_CHART = (typeof Chart !== 'undefined');
+
+if (HAS_CHART) {
+  // Chart.js 기본 폰트를 본문과 동일한 Pretendard로 맞춤 — 안 하면 캔버스 텍스트만 시스템 기본 폰트로 어긋나 보임
+  Chart.defaults.font.family = "'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+  Chart.defaults.color = 'rgba(240,232,210,0.58)';
+} else {
+  console.warn('Chart.js를 불러오지 못했습니다. 그래프는 생략하고 표·목록만 렌더링합니다.');
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('canvas').forEach((c) => {
+      const box = document.createElement('div');
+      box.className = 'chart-fallback';
+      box.textContent = '그래프를 불러오지 못했습니다 (Chart.js 차단). 아래 수치는 정상입니다.';
+      c.replaceWith(box);
+    });
+  });
+}
 
 /* =========================================================
    MOCK DATA — 실 데이터 연동 시 이 배열을 Apps Script(JSONP)
@@ -1280,7 +1301,11 @@ function renderSourceDonut(T){
     </div>
   `).join('');
 
-  const ctx = document.getElementById('sourceDonut').getContext('2d');
+  // 위 범례(dl-item)는 이미 그렸다. Chart.js가 없으면 도넛만 건너뛰고 숫자는 남긴다.
+  const donutEl = document.getElementById('sourceDonut');
+  if(!HAS_CHART || !donutEl) return;
+
+  const ctx = donutEl.getContext('2d');
   const cfg = {
     type:'doughnut',
     data:{ labels:sources, datasets:[{ data:counts, backgroundColor:colors, borderWidth:2, borderColor:'#232e26' }] },
@@ -1417,8 +1442,12 @@ function renderTrendChart(){
       }
     }
   };
+  // 캡션(건수·평균·전년비 요약)은 위에서 이미 갱신했다. 그래프만 건너뛴다.
+  const trendEl = document.getElementById('trendChart');
+  if(!HAS_CHART || !trendEl) return;
+
   if(trendChart) trendChart.destroy();
-  trendChart = new Chart(document.getElementById('trendChart').getContext('2d'), cfg);
+  trendChart = new Chart(trendEl.getContext('2d'), cfg);
 }
 
 /* =========================================================
