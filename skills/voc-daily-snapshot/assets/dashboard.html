@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인생푸드 VOC 데일리 스냅샷 v2</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Mono:wght@400;500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  /* =========================================================
+     올리브 모던(Olive Modern · Mat) 디자인 시스템
+     짙은 포레스트 그린 캔버스 · 본 크림 활자 · 번트 오렌지 액센트 한 점 · 우하단 우드 글로우
+     ========================================================= */
+  :root{
+    --c-bg:           #232e26;
+    --c-bg-alt:       #2e3d30;
+    --c-bg-light:     #ede6d0;
+    --c-bg-light-alt: #e4dac4;
+    --c-fg:           #f0e8d2;
+    --c-fg-2:         rgba(240,232,210,0.74);
+    --c-fg-3:         rgba(240,232,210,0.58);
+    --c-fg-light:     #1e2820;
+    --c-fg-light-2:   rgba(30,40,32,0.60);
+    --c-fg-light-3:   rgba(30,40,32,0.30);
+    --c-accent:       #e46f56;
+    --c-border:       rgba(240,232,210,0.16);
+    --c-border-light: rgba(30,40,32,0.14);
+    --c-wood:         #7a3b28;
+    /* 크림 면 위에 얹는 짙은 레드. 밝은 액센트는 크림 위에서 대비가 무너진다. */
+    --c-accent-ink:   #9e3520;
+
+    --f-display:'Bricolage Grotesque','Pretendard Variable','Pretendard','Noto Sans SC',sans-serif;
+    --f-body:'Pretendard Variable','Pretendard','DM Sans','Noto Sans SC',system-ui,sans-serif;
+    --f-mono:'DM Mono',monospace;
+
+    /* 기존 컴포넌트 규칙을 다 고치지 않고 팔레트만 갈아타기 위해 옛 변수명을 새 토큰으로 재배선한다.
+       액센트는 번트 오렌지 한 색뿐이므로(§2.1), 신호색이던 mint/mustard/ocean은 약화 톤으로 내린다.
+       결과적으로 "문제만 색을 갖는" 화면이 된다. */
+    --ink: var(--c-fg);
+    --ink-soft: var(--c-fg-2);
+    --paper: var(--c-bg);
+    --card: var(--c-bg-alt);
+    --line: var(--c-border);
+    --chili: var(--c-accent);
+    --chili-soft: rgba(228,111,86,0.11);
+    --mustard: var(--c-fg-2);
+    --mustard-soft: rgba(240,232,210,0.07);
+    --mint: var(--c-fg-2);
+    --mint-soft: rgba(240,232,210,0.07);
+    --ocean: var(--c-fg-2);
+    --ocean-soft: rgba(240,232,210,0.07);
+    --slate: var(--c-fg-3);
+    --radius:2px; /* 미드센추리 모던: 라운드를 거의 죽이고 1px 헤어라인으로 면을 가른다 */
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--c-bg);
+    color:var(--c-fg);
+    font-family:var(--f-body);
+    -webkit-font-smoothing:antialiased;
+    font-size:15px;
+    line-height:1.6;
+    word-break:keep-all;
+  }
+  /* 우드 글로우: 우하단에서 흘리는 래디얼 그라데이션. 콘텐츠는 그 위에 뜬다. */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 70% 55% at 88% 92%, rgba(122,59,40,0.30) 0%, rgba(122,59,40,0.12) 45%, transparent 72%);
+  }
+  .app{max-width:1240px;margin:0 auto;padding:28px 24px 70px;position:relative;z-index:1;}
+
+  /* 라벨·킥커는 DM Mono 대문자. 이 화면에서 자간이 살아나는 자리다. */
+  .sec-title,.cb-label,.kw-h,.store-group-label,.pp-title,.mk-label,.rt-badge,.k-label{
+    font-family:var(--f-mono);
+  }
+  h1,h2,h3{font-family:var(--f-display);letter-spacing:-0.01em;}
+
+  /* header */
+  .top{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:1px solid var(--c-border);
+    padding-bottom:16px;margin-bottom:16px;flex-wrap:wrap;gap:12px;
+  }
+  .top .eyebrow{
+    font-size:12px;letter-spacing:.14em;color:var(--chili);font-weight:700;
+    text-transform:uppercase;margin:0 0 6px;
+  }
+  .top h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-.01em;}
+  .top .meta{text-align:right;font-size:13px;color:var(--ink-soft);line-height:1.7;}
+  .top .meta b{color:var(--ink);}
+
+  /* info-card 시그니처: 다크 캔버스에 끼우는 크림 인셋. 이 화면에서 여기 한 곳에만 쓴다. */
+  .proto-banner{
+    background:var(--c-bg-light);
+    border:none;
+    color:var(--c-fg-light);font-size:13px;font-weight:600;
+    border-radius:var(--radius);padding:16px 20px;margin-bottom:22px;
+    display:flex;gap:10px;align-items:flex-start;line-height:1.65;
+  }
+  .proto-banner b{font-size:14px;font-family:var(--f-display);}
+  /* 크림 인셋 위에서는 액센트가 그대로 읽힌다 */
+  .proto-banner .proto-warn{display:block;margin-top:6px;font-weight:800;color:var(--c-accent-ink);}
+
+  /* control bar */
+  .control-bar{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;margin-bottom:22px;
+  }
+  .persona-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .persona-row .cb-label{font-size:12px;font-weight:700;color:var(--ink-soft);margin-right:4px;}
+  .persona-pill{
+    font-size:13px;font-weight:700;padding:7px 14px;border-radius:20px;
+    border:1px solid var(--line);background:var(--c-bg-alt);color:var(--ink-soft);cursor:pointer;
+    transition:all .15s;
+  }
+  .persona-pill:hover{border-color:var(--ink-soft);}
+  .persona-pill.active{background:var(--ink);color:var(--c-bg);border-color:var(--ink);}
+  .scope-note{font-size:12.5px;color:var(--ink-soft);background:rgba(240,232,210,0.06);border-radius:8px;padding:8px 12px;margin-bottom:14px;}
+  .scope-note b{color:var(--ink);}
+  .period-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .period-row input[type=date]{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:var(--c-bg-alt);
+  }
+  .period-row .tilde{color:var(--slate);font-size:13px;}
+  .period-presets{display:flex;gap:6px;}
+  .period-presets button{
+    font-size:12px;font-weight:700;padding:6px 12px;border-radius:16px;border:1px solid var(--line);
+    background:var(--c-bg-alt);color:var(--ink-soft);cursor:pointer;
+  }
+  .period-presets button.active{background:var(--ink);color:var(--c-bg);border-color:var(--ink);}
+  .filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .filter-row select{
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);
+    padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--c-bg-alt);cursor:pointer;
+  }
+  .filter-row .reset-btn{
+    font-size:12.5px;font-weight:700;color:var(--chili);background:var(--chili-soft);
+    border:none;border-radius:10px;padding:8px 14px;cursor:pointer;
+  }
+  .filter-row .reset-btn:hover{opacity:.85;}
+  .active-filters{font-size:12px;color:var(--slate);margin-left:auto;}
+
+  /* alert */
+  .alert{
+    background:var(--card);border-radius:var(--radius);
+    border:1px solid var(--line);border-left:6px solid var(--chili);
+    padding:18px 22px;margin-bottom:24px;
+    display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .alert .label{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--chili);text-transform:uppercase;margin-bottom:5px;}
+  .alert .msg{font-size:16.5px;font-weight:700;}
+  .alert .sub{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+  .alert .stat{font-size:30px;font-weight:800;color:var(--c-accent);white-space:nowrap;font-family:var(--f-display);}
+
+  /* 경쟁사 활동량 랭킹 — WATCHTOWER가 채우는 자리. 자사만 크림으로 띄우고 나머지는 약화 톤 */
+  .ranking-panel{margin-bottom:24px;}
+  .rank-ladders{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+  .rank-ladder{background:var(--c-bg-alt);border:1px solid var(--c-border);border-radius:var(--radius);padding:16px 18px;}
+  .rank-ladder h3{font-size:12px;font-weight:500;font-family:var(--f-mono);letter-spacing:.12em;
+    text-transform:uppercase;color:var(--c-fg-2);margin:0 0 12px;}
+  .rank-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--c-border);font-size:13px;}
+  .rank-row:last-child{border-bottom:none;}
+  .rank-no{font-family:var(--f-mono);font-size:11.5px;color:var(--c-fg-3);width:20px;flex:0 0 20px;}
+  .rank-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--c-fg-2);}
+  .rank-row.own .rank-name{color:var(--c-fg);font-weight:700;}
+  .rank-row.own .rank-no{color:var(--c-accent);}
+  .rank-score{font-family:var(--f-mono);font-size:11.5px;color:var(--c-fg-3);white-space:nowrap;
+    margin-left:auto;padding-left:8px;}
+  .rank-ref{margin-top:10px;padding-top:8px;border-top:1px dashed var(--c-border);}
+  .rank-ref-label{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;
+    color:var(--c-fg-3);margin-bottom:2px;}
+  .rank-ref .rank-row{opacity:.72;border-bottom:none;}
+  .rank-row.own .rank-score{color:var(--c-fg-2);}
+  .rank-move{font-family:var(--f-mono);font-size:11px;white-space:nowrap;color:var(--c-fg-3);}
+  .rank-move.up{color:var(--c-accent);}
+  .rank-empty{background:var(--c-bg-alt);border:1px solid var(--c-border);border-radius:var(--radius);
+    padding:18px 20px;font-size:13px;color:var(--c-fg-2);line-height:1.7;}
+  .rank-empty b{color:var(--c-fg);}
+
+  /* sync badge — 마지막 수집 시각과 오늘 유입 건수. 조용한 실패를 눈에 보이게 만든다 */
+  .sync-badge{
+    font-size:12.5px;font-weight:600;color:var(--ink-soft);
+    background:rgba(240,232,210,0.06);border:1px solid var(--line);border-radius:10px;
+    padding:9px 14px;margin-bottom:14px;
+  }
+  .sync-badge.warn{background:var(--chili-soft);border-color:var(--chili);color:var(--chili);font-weight:700;}
+
+  /* priority panel — "오늘 뭐부터 보나"에 바로 답하는 상단 액션 리스트 */
+  .priority-panel{margin-bottom:22px;}
+  .priority-panel:empty{display:none;}
+  .priority-panel .pp-title{font-size:12px;font-weight:800;color:var(--ink-soft);letter-spacing:.04em;margin-bottom:8px;}
+  .priority-item{
+    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--chili);border-radius:10px;
+    padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;
+    cursor:pointer;transition:all .15s;
+  }
+  .priority-item:hover{border-left-color:var(--ink);background:var(--c-bg-alt);}
+  .priority-item .pi-left{display:flex;align-items:center;gap:10px;min-width:0;}
+  .priority-item .pi-rank{font-size:11px;font-weight:800;color:var(--chili);white-space:nowrap;}
+  .priority-item .pi-store{font-size:12.5px;font-weight:700;white-space:nowrap;}
+  .priority-item .pi-snippet{font-size:13px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+  .priority-item .pi-arrow{color:var(--slate);font-size:13px;}
+
+  /* section titles */
+  /* 섹션 라벨: 모노 대문자 자간. 앞에 32px 레드 rule 한 줄(§2.4 .rule) */
+  .sec-title{
+    font-size:11.5px;font-weight:500;color:var(--c-fg);
+    letter-spacing:.12em;text-transform:uppercase;
+    margin:0 0 12px;display:flex;align-items:center;gap:10px;
+  }
+  .sec-title::before{content:"";width:24px;height:1px;background:var(--c-accent);display:inline-block;flex:0 0 24px;}
+  .sec-caption{font-size:12px;color:var(--c-fg-2);margin:-6px 0 12px;}
+
+  /* kpi row */
+  .kpi-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:30px;}
+  .kpi{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 18px 16px;
+  }
+  .kpi .k-label{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:9px;}
+  .kpi .k-value{font-size:32px;font-weight:800;letter-spacing:-.02em;font-family:var(--f-display);color:var(--c-fg);}
+  /* 통계 단위는 번트 오렌지. 이 템플릿의 시그니처다(§4.3 .mat-stat-val em) */
+  .kpi .k-value span{font-size:15px;font-weight:600;color:var(--c-accent);}
+  .kpi .k-delta{margin-top:9px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;}
+  .k-delta.bad{background:var(--chili-soft);color:var(--chili);}
+  .k-delta.good{background:var(--mint-soft);color:var(--mint);}
+  .k-delta.flat{background:rgba(240,232,210,0.06);color:var(--slate);}
+  .k-note{margin-top:9px;font-size:11.5px;color:var(--slate);}
+
+  /* chart panels */
+  .chart-panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:24px;}
+  .chart-panel .cp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:10px;}
+  .period-toggle{display:flex;gap:6px;}
+  .period-toggle button{
+    font-size:12px;font-weight:700;padding:5px 12px;border-radius:16px;border:1px solid var(--line);
+    background:var(--c-bg-alt);color:var(--ink-soft);cursor:pointer;
+  }
+  .period-toggle button.active{background:var(--ink);color:var(--c-bg);border-color:var(--ink);}
+  .chart-wrap{height:280px;width:100%;position:relative;}
+  .two-charts{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;margin-bottom:24px;}
+  .donut-wrap{height:220px;width:100%;position:relative;display:flex;align-items:center;justify-content:center;}
+  .donut-legend{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .donut-legend .dl-item{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;}
+  .donut-legend .dl-name{display:flex;align-items:center;gap:7px;color:var(--ink-soft);font-weight:600;}
+  .donut-legend .dl-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .donut-legend .dl-count{font-weight:800;color:var(--ink);}
+
+  /* heatmap */
+  .heatmap-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+  .cat-tile{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 12px;position:relative;overflow:hidden;cursor:pointer;transition:all .15s;
+  }
+  .cat-tile:hover{border-color:var(--ink-soft);transform:translateY(-1px);}
+  .cat-tile.flag{border-color:var(--chili);box-shadow:0 0 0 1px var(--chili) inset;}
+  .cat-tile.selected{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset;}
+  .cat-tile .cat-flag-badge{
+    position:absolute;top:8px;right:8px;font-size:9.5px;font-weight:800;color:var(--c-bg);
+    background:var(--chili);padding:2px 6px;border-radius:20px;letter-spacing:.02em;
+  }
+  .cat-tile .cat-eng{font-size:10px;color:var(--slate);font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+  .cat-tile .cat-kr{font-size:14.5px;font-weight:800;margin:2px 0 10px;}
+  .cat-bar{height:9px;border-radius:6px;background:var(--mint-soft);overflow:hidden;display:flex;margin-bottom:8px;}
+  .cat-bar .neg{background:var(--chili);height:100%;}
+  .cat-bar .pos{background:var(--mint);height:100%;}
+  .cat-tile .cat-nums{font-size:11.5px;color:var(--ink-soft);display:flex;justify-content:space-between;}
+  .cat-tile .cat-nums b{color:var(--ink);}
+  .heatmap-legend{display:flex;gap:16px;font-size:11.5px;color:var(--ink-soft);margin-bottom:30px;}
+  .heatmap-legend span{display:inline-flex;align-items:center;gap:5px;}
+  .heatmap-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;}
+
+  /* two col */
+  .two-col{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:16px;margin-bottom:24px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;}
+  .panel h3{font-size:14.5px;margin:0 0 14px;font-weight:800;}
+
+  .kw-block{margin-bottom:16px;}
+  .kw-block:last-child{margin-bottom:0;}
+  .kw-block .kw-h{font-size:11.5px;font-weight:700;color:var(--slate);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+  .kw-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;cursor:pointer;transition:all .15s;}
+  .chip.neg{background:var(--chili-soft);color:var(--chili);}
+  .chip.pos{background:var(--mint-soft);color:var(--mint);}
+  .chip.selected{box-shadow:0 0 0 2px currentColor inset;}
+  .chip .n{opacity:.65;font-weight:600;}
+
+  .store-list{list-style:none;margin:0;padding:0;}
+  .store-list li{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    padding:9px 6px;border-bottom:1px solid var(--line);font-size:13px;
+    cursor:pointer;border-radius:8px;transition:background .15s;
+  }
+  .store-list li:hover{background:var(--c-bg-alt);}
+  .store-list li:last-child{border-bottom:none;}
+  .store-list .s-name{font-weight:700;}
+  .store-list .s-detail{color:var(--ink-soft);font-size:12px;margin-top:1px;}
+  .store-list .s-arrow{color:var(--slate);font-size:13px;}
+  .store-tag{font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+  .store-tag.good{background:var(--mint-soft);color:var(--mint);}
+  .store-tag.watch{background:var(--chili-soft);color:var(--chili);}
+  .store-group-label{font-size:11.5px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px;}
+  .store-group-label:first-child{margin-top:0;}
+
+  /* raw text list */
+  .rawtext-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:24px;}
+  .rawtext-panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;}
+  .rawtext-panel h3{font-size:14.5px;margin:0 0 4px;font-weight:800;}
+  .rawtext-panel .rt-count{font-size:12px;font-weight:600;color:var(--slate);margin:0 0 12px;}
+  .rt-row{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:12px 10px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:8px;
+  }
+  .rt-row:hover{background:var(--c-bg-alt);}
+  .rt-row:last-child{border-bottom:none;}
+  .rt-left{display:flex;align-items:center;gap:10px;min-width:0;}
+  .rt-badge{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .rt-badge.src-delivery{background:rgba(240,232,210,0.10);color:var(--ink-soft);}
+  .rt-badge.src-qr{background:var(--mustard-soft);color:var(--mustard);}
+  .rt-badge.src-owner{background:var(--mint-soft);color:var(--mint);}
+  .rt-badge.src-order{background:var(--ocean-soft);color:var(--ocean);}
+  .rt-badge.src-social{background:rgba(240,232,210,0.10);color:var(--c-fg-2);}
+  .rt-badge.src-etc{background:rgba(240,232,210,0.06);color:var(--slate);}
+  .rt-store{font-size:12.5px;font-weight:700;white-space:nowrap;}
+  .rt-snippet{font-size:13px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+  .rt-right{display:flex;align-items:center;gap:10px;white-space:nowrap;}
+  .rt-rating{font-size:12.5px;font-weight:700;color:var(--ink-soft);}
+  .rt-status{font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+  .rt-status.완료{background:var(--mint-soft);color:var(--mint);}
+  .rt-status.처리중{background:var(--mustard-soft);color:var(--mustard);}
+  .rt-status.접수{background:rgba(240,232,210,0.06);color:var(--slate);}
+  .rt-status.보류{background:var(--ocean-soft);color:var(--ocean);}
+  .rt-arrow{color:var(--slate);font-size:13px;}
+  .rt-empty{padding:20px;text-align:center;color:var(--slate);font-size:13px;}
+  .rt-cap-note{font-size:11.5px;color:var(--slate);background:rgba(240,232,210,0.06);border-radius:8px;padding:7px 10px;margin-bottom:8px;}
+
+  /* 점주·가맹 VOC 전용 미니 요약 — 별점 대신 처리상태 기반 지표 */
+  .mini-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px;}
+  .mini-kpi{background:var(--c-bg-alt);border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+  .mini-kpi .mk-label{font-size:11px;color:var(--ink-soft);font-weight:600;margin-bottom:5px;}
+  .mini-kpi .mk-value{font-size:20px;font-weight:800;letter-spacing:-.01em;font-family:var(--f-display);color:var(--c-fg);}
+  .mini-kpi .mk-value span{font-size:12px;font-weight:600;color:var(--ink-soft);}
+
+  /* menu panel */
+  .menu-panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:24px;}
+  .menu-panel h3{font-size:14px;margin:0 0 4px;font-weight:800;}
+  .menu-caveat{font-size:11.5px;color:var(--slate);margin:0 0 14px;font-style:italic;}
+  .menu-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;}
+  .menu-row:last-child{border-bottom:none;}
+  .menu-row .m-text{color:var(--ink);}
+  .menu-row .m-count{font-weight:800;color:var(--chili);}
+
+  /* tracker */
+  .tracker-note{
+    font-size:12.5px;color:var(--ink-soft);background:rgba(240,232,210,0.06);
+    border-radius:10px;padding:9px 13px;margin-bottom:14px;
+  }
+  .table-scroll{width:100%;overflow-x:auto;margin-bottom:26px;}
+  .tracker-table{width:100%;min-width:520px;border-collapse:collapse;}
+  .tracker-table th{
+    text-align:left;font-size:11.5px;color:var(--slate);font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;padding:0 10px 8px;
+    border-bottom:1px solid var(--line);
+  }
+  .tracker-table td{
+    padding:12px 10px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;
+  }
+  .tracker-table tr:last-child td{border-bottom:none;}
+  .tracker-table .t-name{font-weight:700;}
+  .tracker-table .t-current{font-weight:800;font-size:15px;}
+  .goal-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:rgba(240,232,210,0.06);color:var(--slate);white-space:nowrap;}
+  .track-bar-wrap{width:120px;height:6px;background:rgba(240,232,210,0.06);border-radius:6px;overflow:hidden;}
+  .track-bar-wrap .fill{height:100%;background:var(--slate);opacity:.5;border-radius:6px;}
+
+  footer{
+    border-top:1px solid var(--line);padding-top:16px;margin-top:6px;
+    font-size:12px;color:var(--slate);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  }
+  footer .roadmap span{
+    background:rgba(240,232,210,0.06);padding:3px 9px;border-radius:20px;font-weight:600;margin-right:6px;
+  }
+
+  /* modal */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(20,26,21,0.72);
+    align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    background:var(--c-bg-alt);border-radius:18px;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;
+    padding:26px 28px;position:relative;
+  }
+  .modal-close{
+    position:absolute;top:18px;right:20px;background:rgba(240,232,210,0.06);border:none;border-radius:50%;
+    width:32px;height:32px;font-size:16px;cursor:pointer;color:var(--ink-soft);
+  }
+  .modal-close:hover{background:var(--line);}
+  .modal-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .modal-tag{font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:20px;}
+  .modal-h{font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 6px;}
+  .modal-h:first-of-type{margin-top:0;}
+  .modal-raw{
+    font-size:15px;line-height:1.7;color:var(--ink);background:var(--c-bg-alt);border:1px solid var(--line);
+    border-radius:12px;padding:16px 18px;white-space:pre-wrap;
+  }
+  .modal-reply{
+    font-size:14px;line-height:1.6;color:var(--ink-soft);background:var(--mint-soft);border-radius:12px;
+    padding:14px 16px;
+  }
+  .modal-meta-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;font-size:13px;}
+  .modal-meta-grid div span{color:var(--slate);}
+  .modal-meta-grid div b{display:block;color:var(--ink);}
+
+  @media (max-width:960px){
+    .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .heatmap-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .two-col{grid-template-columns:minmax(0,1fr);}
+    .two-charts{grid-template-columns:minmax(0,1fr);}
+    .rawtext-split{grid-template-columns:minmax(0,1fr);}
+    .mini-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .modal-meta-grid{grid-template-columns:minmax(0,1fr);}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="top">
+    <div>
+      <p class="eyebrow">인생푸드 · 마케팅팀</p>
+      <h1>VOC 데일리 스냅샷</h1>
+    </div>
+    <div class="meta">
+      <div><b id="metaToday">2026.07.23</b> 일일 허들용</div>
+      <div id="metaAsOf">데이터 기준 : 07.22 24:00 집계분</div>
+    </div>
+  </div>
+
+  <div class="proto-banner">🧪 <div><b>프로토타입 v2</b> — 아래 수치는 실제 데이터가 아닌 샘플입니다. 배달앱리뷰(댓글몽)·QR설문·점주VOC·발주고 4개 소스 통합 레이아웃입니다. 지사 계정은 소속 매장 VOC만 조회되며, 원문(raw_text)도 소속 매장 범위 내에서는 그대로 노출된다고 가정했습니다 (권한 범위 최종안 확정 전 가정치).<span class="proto-warn">⚠️ 실데이터 연동 전까지 의사결정·임원보고 자료로 사용하지 마세요.</span></div></div>
+
+  <div class="sync-badge" id="syncBadge" style="display:none;"></div>
+
+  <div class="control-bar">
+    <div class="persona-row">
+      <span class="cb-label">열람 권한</span>
+      <button class="persona-pill active" data-persona="hq">본사(전체)</button>
+      <button class="persona-pill" data-persona="yeongnam">영남지사</button>
+      <button class="persona-pill" data-persona="honam">호남지사</button>
+    </div>
+    <div class="scope-note" id="scopeNote"></div>
+    <div class="period-row">
+      <span class="cb-label">수집 기간</span>
+      <input type="date" id="rangeStart">
+      <span class="tilde">~</span>
+      <input type="date" id="rangeEnd">
+      <div class="period-presets">
+        <button data-preset="1">오늘</button>
+        <button data-preset="7">최근 7일</button>
+        <button data-preset="14">최근 14일</button>
+        <button data-preset="all">전체</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <select id="storeFilter"></select>
+      <select id="categoryFilter"></select>
+      <select id="sourceFilter">
+        <option value="all">소스 전체</option>
+        <option value="배달앱리뷰">배달앱리뷰</option>
+        <option value="QR설문">QR설문</option>
+        <option value="점주VOC">점주VOC</option>
+        <option value="발주고">발주고</option>
+        <option value="소셜·커뮤니티">소셜·커뮤니티</option>
+      </select>
+      <button class="reset-btn" id="resetBtn">필터 초기화</button>
+      <span class="active-filters" id="activeFilters"></span>
+    </div>
+  </div>
+
+  <div class="alert" id="alertBox"></div>
+
+  <div class="priority-panel" id="priorityPanel"></div>
+
+  <p class="sec-title" id="kpiSectionTitle">오늘의 핵심 지표</p>
+  <p class="sec-caption" id="kpiSectionCaption">현재 필터·권한 범위 기준 (전일 대비)</p>
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="chart-panel">
+    <div class="cp-head">
+      <p class="sec-title" style="margin:0;">일자별 VOC 추이</p>
+      <div class="period-toggle" id="periodToggle">
+        <button data-days="7">7일</button>
+        <button data-days="14" class="active">14일</button>
+        <button data-days="30">30일</button>
+        <button data-days="90">90일</button>
+        <button id="yoyToggle" title="같은 기간을 1년 전과 겹쳐 봅니다">전년 대비</button>
+      </div>
+    </div>
+    <p class="sec-caption" id="trendCaption">※ 전사(본사) 기준 추이이며, 상단 필터·지사 선택의 영향을 받지 않습니다.</p>
+    <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+  </div>
+
+  <div class="two-charts">
+    <div class="chart-panel" style="margin-bottom:0;">
+      <p class="sec-title">4P+2P 카테고리 히트맵</p>
+      <p class="sec-caption">타일 클릭 시 해당 카테고리로 전체 섹션 필터링</p>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+      <div class="heatmap-legend"><span><i style="background:var(--chili);"></i>부정 비중</span><span><i style="background:var(--mint);"></i>긍정 비중</span></div>
+      <p class="sec-caption" style="margin-top:6px;">※ 이상신호 배지는 표본 3건 이상 기준입니다 — 매장·카테고리당 건수가 적을 때는 참고용으로만 봐주세요.</p>
+    </div>
+    <div class="chart-panel" style="margin-bottom:0;">
+      <p class="sec-title">소스별 VOC 비중</p>
+      <p class="sec-caption">현재 필터·권한 범위 기준</p>
+      <div class="donut-wrap"><canvas id="sourceDonut"></canvas></div>
+      <div class="donut-legend" id="donutLegend"></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="panel">
+      <h3>키워드 하이라이트</h3>
+      <div id="keywordPanel"></div>
+    </div>
+    <div class="panel">
+      <h3>매장 하이라이트</h3>
+      <ul class="store-list" id="storeList"></ul>
+    </div>
+  </div>
+
+  <p class="sec-title">VOC 원문 리스트</p>
+  <p class="sec-caption">행을 클릭하면 가공·요약 없이 raw_text 원문 그대로 표시됩니다 · 고객 접점(배달앱리뷰·QR설문)과 점주/가맹 접점(점주VOC·발주고)을 구분해서 봅니다</p>
+  <div class="rawtext-split">
+    <div class="rawtext-panel">
+      <h3 id="rtCustomerTitle">고객 VOC 원문</h3>
+      <div id="rawTextListCustomer"></div>
+    </div>
+    <div class="rawtext-panel">
+      <h3 id="rtOwnerTitle">점주·가맹 VOC 원문</h3>
+      <div class="mini-kpi-row" id="ownerKpiRow"></div>
+      <div id="rawTextListOwner"></div>
+    </div>
+  </div>
+
+  <p class="sec-title">메뉴별 이슈 TOP</p>
+  <div class="menu-panel">
+    <p class="menu-caveat">*메뉴명 통합(원문 태그·표기 정규화) 해결 시 정확한 집계 가능 — 현재는 댓글몽 CSV 원문 표기 그대로 집계된 예시입니다.</p>
+    <div id="menuPanel"></div>
+  </div>
+
+  <p class="sec-title">VOC 관리 KPI 트래커 (예시)</p>
+  <div class="tracker-note">※ 아래는 대시보드에서 산출 가능한 지표 예시입니다. 목표 수치는 KPI Q&amp;A 15문항 확정 후 반영 예정입니다.</div>
+  <div class="table-scroll">
+    <table class="tracker-table">
+      <thead>
+        <tr><th>KPI</th><th>목표</th><th>현재(오늘)</th><th>진척</th><th>비고</th></tr>
+      </thead>
+      <tbody id="trackerBody"></tbody>
+    </table>
+  </div>
+
+  <p class="sec-title">경쟁사 활동량 랭킹</p>
+  <p class="sec-caption">WATCHTOWER가 주 1회(월요일) 갱신합니다 · 공개 노출 활동량이지 경쟁력 지표가 아닙니다</p>
+  <div class="ranking-panel" id="rankingPanel"></div>
+
+  <footer>
+    <div>기준 매장 8개(국내) · 인생아구찜 브랜드 · 배달앱리뷰(댓글몽) + QR설문 + 점주VOC + 발주고 + 소셜·커뮤니티 통합</div>
+    <div class="roadmap"><span>해외 VOC</span><span>본사/지사 인증 로그인</span><span>KPI 목표 수치 확정</span> 연동 예정</div>
+  </footer>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-tags" id="modalTags"></div>
+    <div class="modal-h">VOC 원문 (raw_text)</div>
+    <div class="modal-raw" id="modalRaw"></div>
+    <div id="modalReplyWrap" style="display:none;">
+      <div class="modal-h">매장/CS 답변</div>
+      <div class="modal-reply" id="modalReply"></div>
+    </div>
+    <div class="modal-h">상세 정보</div>
+    <div class="modal-meta-grid" id="modalMeta"></div>
+  </div>
+</div>
+
+<script>
+// Chart.js 기본 폰트를 본문과 동일한 Pretendard로 맞춤 — 안 하면 캔버스 텍스트만 시스템 기본 폰트로 어긋나 보임
+Chart.defaults.font.family = "'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.color = 'rgba(240,232,210,0.58)';
+
+/* =========================================================
+   MOCK DATA — 실 데이터 연동 시 이 배열을 Apps Script(JSONP)
+   fetch 결과로 교체. 필드는 마스터 시트 설계안과 동일하게 구성:
+   voc_id, source, store_id, store_name, platform, date, rating,
+   sentiment, category, keywords, raw_text, response_status, reply_text
+   ========================================================= */
+const CATS = [
+  {key:'product',   kr:'Product',    sub:'제품(맛·품질)'},
+  {key:'price',     kr:'Price',      sub:'가격'},
+  {key:'place',     kr:'Place',      sub:'매장환경'},
+  {key:'promotion', kr:'Promotion',  sub:'프로모션'},
+  {key:'people',    kr:'People',     sub:'응대·사람'},
+  {key:'process',   kr:'Process',    sub:'배송·처리'},
+];
+
+// 목업 8개 매장(수도권 임의명)은 데모용이라 실제 지사 매장 리스트와 이름이 겹치지 않음 —
+// 실데이터 연동 후에는 REGIONS의 실제 매장명 기준으로 자동 매칭됩니다.
+const STORE_META = {
+  '마곡점':   {id:'ST01', region:'hq'},
+  '서초점':   {id:'ST02', region:'hq'},
+  '강남점':   {id:'ST03', region:'hq'},
+  '영통점':   {id:'ST04', region:'hq'},
+  '부산본점': {id:'ST05', region:'yeongnam'},
+  '경산점':   {id:'ST06', region:'yeongnam'},
+  '검바위점': {id:'ST07', region:'yeongnam'},
+  '하늘도시점':{id:'ST08', region:'hq'},
+  '성남점':   {id:'ST09', region:'hq'}, // 소셜 표본(다이닝코드)에서 확인된 매장
+};
+
+// 2026-07-28 "댓글몽BIZ매장등록" 파일의 담당자 컬럼 기준 실제 매장 목록.
+// 본사 직할 슈퍼바이저(강민혁·김민준·유재우·김성철·김민지·김선근·김동혁·황연준) 담당 154개 매장은
+// 별도 지사가 아니라 전부 본사(hq) 범위에 포함됩니다. 지사는 영남·호남 둘뿐입니다.
+const REGIONS = {
+  hq: {label:'본사(전체)', stores:null},
+  yeongnam: {label:'영남지사', stores:[
+    '인생아구찜 수성점','인생아구찜 울산동구점','인생아구찜 칠곡점','인생아구찜 명지점','인생아구찜 성서점',
+    '인생아구찜 부산진구점','인생아구찜 장산점','인생아구찜 광안점','인생아구찜 경산점','인생아구찜 사하점',
+    '인생아구찜 내당점','인생아구찜 울산남구점','인생아구찜 울산북구점','인생아구찜 금정점','인생아구찜 울산무거점',
+    '인생아구찜 산격점','인생아구찜 사상점','인생아구찜 포항북구점','인생아구찜 구미 원호문성점','인생아구찜 양산물금점',
+    '인생아구찜 진해점','인생아구찜 남포점','인생아구찜 문현점','인생아구찜 온산온양점','인생아구찜 송정연암점',
+    '인생아구찜 장유점','인생아구찜 수성못점','인생아구찜 대구동구점','인생아구찜 달서점','인생아구찜 경주점',
+    '인생아구찜 부산북구점','인생아구찜 울산중구점','인생아구찜 용호메트로시티점','인생아구찜 현풍테크노점','인생아구찜 내외점',
+    '인생아구찜 센텀점','인생아구찜 신경주점',
+  ]},
+  honam: {label:'호남지사', stores:[
+    '인생아구찜 창원점','인생아구찜 남악점','인생아구찜 목포점','인생아구찜 회원점','인생아구찜 광주북구점',
+    '인생아구찜 송천점','인생아구찜 왕지점','인생아구찜 신용점','인생아구찜 진주망경점','인생아구찜 중마점',
+    '인생아구찜 여천점','인생아구찜 순천오천점','인생아구찜 익산영등어양점','인생아구찜 여수문수점','인생아구찜 광산점',
+    '인생아구찜 인후우아점','인생아구찜 군산점','인생아구찜 순천중앙점','인생아구찜 효자점','인생아구찜 해남점',
+    '인생아구찜 옥종점','인생아구찜 광주동구점','인생아구찜 진주점','인생아구찜 봉동점','인생아구찜 전주혁신점',
+  ]},
+};
+
+// 배달앱리뷰만 중립색으로 뺀 이유: chili(빨강)는 대시보드 전체에서 "부정/긴급"을 뜻하는 색인데,
+// 리뷰 소스 배지에도 같이 쓰면 긍정 리뷰조차 빨간 배지를 달게 되어 신호가 겹침(RED 패널 지적, 2026-08-12 반영)
+const SOURCE_HEX = {
+  '배달앱리뷰':'rgba(240,232,210,0.72)',
+  'QR설문':'rgba(240,232,210,0.52)',
+  '점주VOC':'rgba(240,232,210,0.38)',
+  '발주고':'rgba(240,232,210,0.26)',
+  '소셜·커뮤니티':'#e46f56',
+};
+const ALL_SOURCES = Object.keys(SOURCE_HEX);
+
+// 배지 CSS 클래스는 소스명을 그대로 쓰면 안 된다. '소셜·커뮤니티'의 가운뎃점처럼
+// CSS 클래스로 못 쓰는 문자가 섞이면 그 배지만 조용히 스타일이 빠진다.
+const SOURCE_CLASS = {
+  '배달앱리뷰':'src-delivery',
+  'QR설문':'src-qr',
+  '점주VOC':'src-owner',
+  '발주고':'src-order',
+  '소셜·커뮤니티':'src-social',
+};
+const srcClass = s => SOURCE_CLASS[s] || 'src-etc';
+
+// Apps Script 웹앱 배포 후 이 URL만 채우면 실데이터로 자동 전환됩니다 (비워두면 아래 목업으로 동작)
+// 공개 저장소이므로 비워둔 상태입니다. 형식:
+//   https://script.google.com/macros/s/<배포ID>/exec
+const DATA_ENDPOINT = '';
+
+const MOCK_DATA = [
+  // ---- 어제(07.22) ----
+  {id:'R220-1', source:'배달앱리뷰', platform:'배달의민족', store:'마곡점', date:'2026-07-22', rating:5, sentiment:'긍정', category:'product', keyword:'양많음', menu:'[인기메뉴]살마니아구찜(추천)', raw_text:'양이 진짜 많아서 두 끼 나눠 먹었어요! 최고입니다', response:'완료', resolvedHours:1.5, reply_text:'소중한 리뷰 감사합니다! 앞으로도 넉넉한 양으로 보답하겠습니다 :)'},
+  {id:'R220-2', source:'배달앱리뷰', platform:'요기요', store:'서초점', date:'2026-07-22', rating:5, sentiment:'긍정', category:'product', keyword:'맛있음', menu:'살마니아구찜(순살X)', raw_text:'국물이 얼큰하고 아구가 부드러워서 너무 맛있었어요', response:'완료', resolvedHours:2},
+  {id:'R220-3', source:'배달앱리뷰', platform:'쿠팡이츠', store:'부산본점', date:'2026-07-22', rating:3, sentiment:'부정', category:'process', keyword:'배달지연', menu:'[주문1등] 살마니아구찜', raw_text:'주문한지 1시간 넘어서 왔어요. 배달이 너무 늦네요', response:'완료', resolvedHours:5},
+  {id:'R220-4', source:'배달앱리뷰', platform:'배달의민족', store:'영통점', date:'2026-07-22', rating:4, sentiment:'긍정', category:'people', keyword:'친절응대', menu:'영양만점 알곤이찜', raw_text:'포장 꼼꼼하고 사장님이 문자로 안내도 친절하게 해주셨어요', response:'완료', resolvedHours:1},
+  {id:'R220-5', source:'배달앱리뷰', platform:'요기요', store:'경산점', date:'2026-07-22', rating:5, sentiment:'긍정', category:'product', keyword:'맛있음', menu:'콜라겐아구찜(추천)', raw_text:'콜라겐아구찜 진짜 존맛! 다음에 또 시킬게요', response:'완료', resolvedHours:0.5},
+  {id:'R220-6', source:'배달앱리뷰', platform:'쿠팡이츠', store:'강남점', date:'2026-07-22', rating:2, sentiment:'부정', category:'process', keyword:'포장불량', menu:'[인기메뉴]살마니아구찜', raw_text:'국물이 다 새서 가방까지 젖었어요 포장 좀 신경써주세요', response:'미응대'},
+  {id:'R220-7', source:'배달앱리뷰', platform:'배달의민족', store:'하늘도시점', date:'2026-07-22', rating:5, sentiment:'긍정', category:'price', keyword:'가성비', menu:'[주문1위]콜라겐아구찜', raw_text:'이 가격에 이 양이면 가성비 최고죠', response:'완료', resolvedHours:2},
+  {id:'R220-8', source:'배달앱리뷰', platform:'요기요', store:'검바위점', date:'2026-07-22', rating:1, sentiment:'부정', category:'product', keyword:'양적음', menu:'1인 콜라겐 아구찜+수제어묵탕', raw_text:'1인분인데 양이 너무 적어요 사진이랑 다름', response:'완료', resolvedHours:6},
+  {id:'R220-9', source:'배달앱리뷰', platform:'쿠팡이츠', store:'마곡점', date:'2026-07-22', rating:5, sentiment:'긍정', category:'people', keyword:'친절응대', menu:'종합영양제 해물아구찜', raw_text:'라이더님도 친절하시고 포장도 완벽했어요', response:'완료', resolvedHours:1, reply_text:'친절 후기 감사합니다. 직원들에게 꼭 전달하겠습니다.'},
+  {id:'R220-10', source:'배달앱리뷰', platform:'배달의민족', store:'서초점', date:'2026-07-22', rating:4, sentiment:'긍정', category:'product', keyword:'맛있음', menu:'[주문1등]콜라겐아구찜', raw_text:'콜라겐아구찜 매콤달콤 딱 좋았습니다', response:'완료', resolvedHours:1.5},
+  {id:'Q220-1', source:'QR설문', platform:'QR', store:'마곡점', date:'2026-07-22', rating:5, sentiment:'긍정', category:'place', keyword:'매장청결', raw_text:'매장이 정말 깨끗하고 관리가 잘 되어 있네요', response:null},
+  {id:'Q220-2', source:'QR설문', platform:'QR', store:'부산본점', date:'2026-07-22', rating:3, sentiment:'중립', category:'process', keyword:'대기시간', raw_text:'주말이라 그런지 대기시간이 좀 길었어요', response:null},
+  {id:'V220-1', source:'점주VOC', platform:'구글시트', store:'부산본점', date:'2026-07-22', rating:null, sentiment:'부정', category:'process', keyword:'배달대행지연', raw_text:'요 며칠 배달대행 배차가 안 잡혀서 지연 컴플레인이 계속 들어옵니다. 대행사 확인 부탁드려요', response:'처리중'},
+  {id:'V220-2', source:'점주VOC', platform:'구글시트', store:'강남점', date:'2026-07-22', rating:null, sentiment:'부정', category:'place', keyword:'주차불편', raw_text:'매장 앞 주차공간이 부족해서 손님들 불편 문의가 많습니다', response:'완료', resolvedHours:20},
+  {id:'F220-1', source:'발주고', platform:'발주고', store:'서초점', date:'2026-07-22', rating:null, sentiment:'중립', category:'process', keyword:'발주시스템', raw_text:'발주 시스템 접속이 느려요. 개선 가능할까요?', response:'완료', resolvedHours:8, reply_text:'시스템 점검 완료했습니다. 이용에 불편 드려 죄송합니다.'},
+
+  // ---- 오늘(07.23) : Process/부정 급증 스토리 ----
+  {id:'R230-1', source:'배달앱리뷰', platform:'배달의민족', store:'부산본점', date:'2026-07-23', rating:1, sentiment:'부정', category:'process', keyword:'배달지연', menu:'[인기메뉴]살마니아구찜', raw_text:'두 시간 걸려서 왔어요 다 불어서 못 먹을 지경이었습니다', response:'미응대'},
+  {id:'R230-2', source:'배달앱리뷰', platform:'요기요', store:'부산본점', date:'2026-07-23', rating:2, sentiment:'부정', category:'process', keyword:'배달지연', menu:'살마니아구찜(어린이)', raw_text:'배달이 계속 늦어지네요 오늘도 한 시간 반 걸렸어요', response:'미응대'},
+  {id:'R230-3', source:'배달앱리뷰', platform:'쿠팡이츠', store:'부산본점', date:'2026-07-23', rating:2, sentiment:'부정', category:'process', keyword:'배달지연', menu:'[주문1등] 살마니아구찜', raw_text:'주문 확인도 늦고 배달도 늦고 답답합니다', response:'미응대'},
+  {id:'R230-4', source:'배달앱리뷰', platform:'배달의민족', store:'영통점', date:'2026-07-23', rating:3, sentiment:'부정', category:'process', keyword:'배달지연', menu:'살마니아구찜(어린이)', raw_text:'예상시간보다 40분 더 걸렸어요', response:'완료', resolvedHours:6},
+  {id:'R230-5', source:'배달앱리뷰', platform:'요기요', store:'부산본점', date:'2026-07-23', rating:1, sentiment:'부정', category:'process', keyword:'포장불량', menu:'영양만점 알곤이찜', raw_text:'국물통이 파손돼서 다 쏟아졌어요 이번주만 두 번째입니다', response:'미응대'},
+  {id:'R230-6', source:'배달앱리뷰', platform:'쿠팡이츠', store:'경산점', date:'2026-07-23', rating:5, sentiment:'긍정', category:'product', keyword:'맛있음', menu:'콜라겐아구찜(추천)', raw_text:'콜라겐아구찜 역시 믿고 시키는 맛', response:'완료', resolvedHours:1.5},
+  {id:'R230-7', source:'배달앱리뷰', platform:'배달의민족', store:'마곡점', date:'2026-07-23', rating:5, sentiment:'긍정', category:'product', keyword:'맛있음', menu:'[인기메뉴]살마니아구찜', raw_text:'매콤한 국물맛이 일품이에요 재주문 예정', response:'완료', resolvedHours:2, reply_text:'맛있게 드셨다니 기쁩니다! 다음 주문도 기대할게요.'},
+  {id:'R230-8', source:'배달앱리뷰', platform:'요기요', store:'마곡점', date:'2026-07-23', rating:5, sentiment:'긍정', category:'people', keyword:'친절응대', menu:'영양만점 알곤이찜', raw_text:'사장님이 서비스도 챙겨주시고 너무 친절하세요', response:'완료', resolvedHours:1},
+  {id:'R230-9', source:'배달앱리뷰', platform:'쿠팡이츠', store:'마곡점', date:'2026-07-23', rating:5, sentiment:'긍정', category:'product', keyword:'양많음', menu:'[주문1등]콜라겐아구찜', raw_text:'양도 많고 맛도 좋아서 가족들 다 만족했어요', response:'완료', resolvedHours:2.5},
+  {id:'R230-10', source:'배달앱리뷰', platform:'배달의민족', store:'서초점', date:'2026-07-23', rating:4, sentiment:'긍정', category:'price', keyword:'가성비', menu:'[주문1위]콜라겐아구찜', raw_text:'가격 대비 양이 많아서 자주 시켜먹어요', response:'완료', resolvedHours:3},
+  {id:'R230-11', source:'배달앱리뷰', platform:'요기요', store:'강남점', date:'2026-07-23', rating:5, sentiment:'긍정', category:'product', keyword:'맛있음', menu:'살마니아구찜(순살X)', raw_text:'매운맛 조절도 딱 맞고 아구도 실했어요', response:'완료', resolvedHours:1},
+  {id:'R230-12', source:'배달앱리뷰', platform:'쿠팡이츠', store:'하늘도시점', date:'2026-07-23', rating:3, sentiment:'부정', category:'product', keyword:'양적음', menu:'1인 콜라겐 아구찜+수제어묵탕', raw_text:'1인분 양이 조금 아쉬웠어요', response:'완료', resolvedHours:4},
+  {id:'R230-13', source:'배달앱리뷰', platform:'배달의민족', store:'검바위점', date:'2026-07-23', rating:4, sentiment:'긍정', category:'people', keyword:'친절응대', menu:'[인기메뉴]살마니아구찜', raw_text:'포장 상태도 좋고 응대도 친절했습니다', response:'완료', resolvedHours:4},
+  {id:'R230-14', source:'배달앱리뷰', platform:'요기요', store:'영통점', date:'2026-07-23', rating:5, sentiment:'긍정', category:'product', keyword:'맛있음', menu:'종합영양제 해물아구찜', raw_text:'해물이 신선하고 국물이 깊어요', response:'완료', resolvedHours:1.5},
+  {id:'R230-15', source:'배달앱리뷰', platform:'쿠팡이츠', store:'부산본점', date:'2026-07-23', rating:2, sentiment:'부정', category:'process', keyword:'배달지연', menu:'[인기메뉴]살마니아구찜', raw_text:'오늘도 배달 지연... 이번주 세 번째입니다', response:'미응대'},
+  {id:'Q230-1', source:'QR설문', platform:'QR', store:'부산본점', date:'2026-07-23', rating:2, sentiment:'부정', category:'process', keyword:'대기시간', raw_text:'포장 주문했는데 대기시간이 너무 길었어요', response:null},
+  {id:'Q230-2', source:'QR설문', platform:'QR', store:'마곡점', date:'2026-07-23', rating:5, sentiment:'긍정', category:'people', keyword:'친절응대', raw_text:'직원분들이 다 친절하시고 매장 분위기도 좋아요', response:null},
+  {id:'Q230-3', source:'QR설문', platform:'QR', store:'서초점', date:'2026-07-23', rating:4, sentiment:'긍정', category:'place', keyword:'매장청결', raw_text:'테이블이랑 화장실 모두 깨끗하게 관리되고 있어요', response:null},
+  {id:'V230-1', source:'점주VOC', platform:'구글시트', store:'부산본점', date:'2026-07-23', rating:null, sentiment:'부정', category:'process', keyword:'배달대행업체이슈', raw_text:'오늘도 배달대행 배차 지연으로 컴플레인 5건 이상 발생했습니다. 대행업체 교체 검토가 필요할 것 같습니다', response:'접수'},
+  {id:'V230-2', source:'점주VOC', platform:'구글시트', store:'마곡점', date:'2026-07-23', rating:null, sentiment:'긍정', category:'people', keyword:'직원우수사례', raw_text:'김OO 직원이 고객 응대를 정말 잘해줘서 칭찬 리뷰가 여러 건 들어왔습니다. 우수사례로 공유드립니다', response:'완료', resolvedHours:5, reply_text:'우수사례 감사히 확인했습니다. 포상 프로세스 진행하겠습니다.'},
+  {id:'F230-1', source:'발주고', platform:'발주고', store:'강남점', date:'2026-07-23', rating:null, sentiment:'부정', category:'process', keyword:'정산지연', raw_text:'발주 정산이 이틀째 지연되고 있습니다. 확인 부탁드립니다', response:'접수'},
+  {id:'F230-2', source:'발주고', platform:'발주고', store:'경산점', date:'2026-07-23', rating:null, sentiment:'긍정', category:'promotion', keyword:'프로모션문의', raw_text:'이번 프로모션 반응이 좋아서 재고 언제 추가되는지 문의드립니다', response:'완료', resolvedHours:3},
+
+  // ---- 소셜·커뮤니티 (5번째 소스) ----
+  // 아래 2건은 2026-08-20 다이닝코드에서 실제로 확인한 리뷰다(성남점 3.0점, 2건).
+  // 목업 날짜 체계에 맞추려고 date만 오늘로 옮겼고, 본문·별점·매장은 원문 그대로다.
+  {id:'SO230-1', source:'소셜·커뮤니티', platform:'다이닝코드', store:'성남점', date:'2026-07-23', rating:3, sentiment:'중립', category:'product', keyword:'매운맛약함', raw_text:'무난한 맛입니다. 다만 기본맛이 매운 맛이 거의 없어 아이들이 먹기 좋을 거 같네요', response:null, url:'https://www.diningcode.com/profile.php?rid=9Giq0R0zDbo2'},
+  {id:'SO230-2', source:'소셜·커뮤니티', platform:'다이닝코드', store:'성남점', date:'2026-07-22', rating:3, sentiment:'중립', category:'product', keyword:'평범함', raw_text:'주먹밥에 게간장이 들어간 느낌이라 색다른 느낌이네요~아구찜은 평범 ㅎㅎ', response:null, url:'https://www.diningcode.com/profile.php?rid=9Giq0R0zDbo2'},
+];
+
+// 매장명은 원문 그대로 사용, 메뉴명도 댓글몽 CSV 원본 표기 그대로(비정규화 상태)
+MOCK_DATA.forEach(d=>{ const m = STORE_META[d.store]; if(m){ d.store_id = m.id; d.region = m.region; } });
+
+// 07.10 ~ 07.21 전사 집계 추이 (일자별 상세 원문 미보관, 집계치만 존재하는 구간)
+const TREND_HISTORY = [
+  {date:'2026-07-10', count:15, avg:4.3, crit:13.3},
+  {date:'2026-07-11', count:13, avg:4.4, crit:9.2},
+  {date:'2026-07-12', count:17, avg:4.2, crit:15.8},
+  {date:'2026-07-13', count:11, avg:4.5, crit:8.1},
+  {date:'2026-07-14', count:14, avg:4.3, crit:12.4},
+  {date:'2026-07-15', count:16, avg:4.1, crit:17.6},
+  {date:'2026-07-16', count:12, avg:4.4, crit:9.8},
+  {date:'2026-07-17', count:18, avg:4.0, crit:20.1},
+  {date:'2026-07-18', count:13, avg:4.3, crit:11.2},
+  {date:'2026-07-19', count:15, avg:4.2, crit:14.5},
+  {date:'2026-07-20', count:14, avg:4.4, crit:10.3},
+  {date:'2026-07-21', count:16, avg:4.1, crit:16.9},
+];
+
+let DATA = MOCK_DATA;
+let allDates = [];      // DATA에 존재하는 날짜 전체(오름차순) — 날짜 범위 선택의 min/max 기준
+let today, yday, T_ALL, Y_ALL;
+let SERVER_TREND = null; // 백엔드가 미리 집계해서 내려준 일별 트렌드 — 있으면 원문 스캔 없이 이걸 그대로 씀 (볼륨이 커져도 가벼움)
+
+/* ---------- 계산 helper ---------- */
+const rated = arr => arr.filter(x=>x.rating!=null);
+const avgRating = arr => { const r=rated(arr); return r.length? (r.reduce((s,x)=>s+x.rating,0)/r.length):0; };
+const criticalRate = arr => { const r=rated(arr); return r.length? r.filter(x=>x.rating<=3).length/r.length*100:0; };
+const noResponse = arr => arr.filter(x=>x.source==='배달앱리뷰' && x.response==='미응대').length;
+const avgLeadtime = arr => {
+  const done = arr.filter(x=>x.resolvedHours!=null);
+  return done.length ? done.reduce((s,x)=>s+x.resolvedHours,0)/done.length : null;
+};
+
+let CURRENT_COMPARE_LABEL = '전일 대비'; // 기간이 1일이면 "전일 대비", 여러 날이면 "이전 동일기간 대비"로 바뀜
+function deltaTag(curr, prev, {higherIsBad=false, unit=''} = {}){
+  const diff = curr - prev;
+  const dir = diff===0 ? 'flat' : (diff>0 ? 'up':'down');
+  let cls='flat';
+  if(diff!==0){
+    const badGoingUp = higherIsBad && diff>0;
+    const badGoingDown = !higherIsBad && diff<0;
+    cls = (badGoingUp||badGoingDown) ? 'bad' : 'good';
+  }
+  const arrow = dir==='up' ? '▲' : dir==='down' ? '▼' : '—';
+  const val = Math.abs(diff).toFixed(unit==='%'?1:(unit==='점'?2:0));
+  return {cls, html:`${arrow} ${CURRENT_COMPARE_LABEL} ${val}${unit}`};
+}
+
+function normalizeRow(d){
+  const m = STORE_META[d.store];
+  // preview = 목록 한 줄에 보여줄 글. 실데이터는 백엔드가 snippet(60자)만 내려주고,
+  // 목업은 raw_text를 그대로 들고 있어서 둘 다 받도록 한다.
+  // raw_text 전문은 모달을 열 때만 mode=detail로 따로 받아온다(응답 크기 때문).
+  return { ...d,
+    store_id: d.store_id || (m && m.id) || 'UNKNOWN',
+    region: d.region || (m && m.region) || 'unassigned',
+    rating: (d.rating===''||d.rating==null) ? null : Number(d.rating),
+    preview: d.raw_text || d.snippet || '',
+  };
+}
+function buildTrendPoints(allData){
+  const map = {};
+  allData.forEach(x=>{ (map[x.date] = map[x.date]||[]).push(x); });
+  return Object.keys(map).sort().map(d=>{
+    const arr = map[d];
+    return { date:d, count:arr.length, avg:avgRating(rated(arr)), crit:criticalRate(arr) };
+  });
+}
+
+function addDays_(dateStr, n){
+  const d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+n);
+  return d.toISOString().slice(0,10);
+}
+function daysBetween_(a,b){
+  return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000);
+}
+
+// 사용자가 고른 기간(state.rangeStart~rangeEnd)을 T_ALL로, 그 직전 동일 길이 구간을 Y_ALL(비교 대상)로 계산
+function computePeriodData(){
+  T_ALL = DATA.filter(x=> x.date>=state.rangeStart && x.date<=state.rangeEnd);
+  const spanDays = daysBetween_(state.rangeStart, state.rangeEnd) + 1;
+  const prevEnd = addDays_(state.rangeStart, -1);
+  const prevStart = addDays_(prevEnd, -(spanDays-1));
+  Y_ALL = DATA.filter(x=> x.date>=prevStart && x.date<=prevEnd);
+}
+
+function syncRangeInputs(){
+  document.getElementById('rangeStart').value = state.rangeStart;
+  document.getElementById('rangeEnd').value = state.rangeEnd;
+}
+
+function updatePeriodLabels(){
+  const single = state.rangeStart === state.rangeEnd;
+  CURRENT_COMPARE_LABEL = single ? '전일 대비' : '이전 동일기간 대비';
+  const titleEl = document.getElementById('kpiSectionTitle');
+  const capEl = document.getElementById('kpiSectionCaption');
+  if(titleEl) titleEl.textContent = single ? '오늘의 핵심 지표' : '선택 기간 핵심 지표';
+  if(capEl) capEl.textContent = single
+    ? '현재 필터·권한 범위 기준 (전일 대비)'
+    : `현재 필터·권한 범위 기준 (${state.rangeStart} ~ ${state.rangeEnd}, 이전 동일기간 대비)`;
+  const todayLabel = document.getElementById('metaToday');
+  const asOfLabel = document.getElementById('metaAsOf');
+  if(todayLabel) todayLabel.textContent = single
+    ? state.rangeEnd.replace(/-/g,'.')
+    : `${state.rangeStart.replace(/-/g,'.')} ~ ${state.rangeEnd.replace(/-/g,'.')}`;
+  if(asOfLabel) asOfLabel.textContent = single
+    ? `데이터 기준 : ${addDays_(state.rangeStart,-1).slice(5).replace('-','.')} 24:00 집계분`
+    : `선택 기간 데이터 기준`;
+}
+
+// 실데이터/목업 데이터 어느 쪽이 들어와도 이 함수 하나로 날짜 범위·화면을 갱신
+// trendOverride: 백엔드가 rollupAndArchive()로 미리 집계해둔 일별 트렌드(건수/평균별점/크리티컬%) — 있으면 그걸 그대로 씀
+function initFromData(rawData, trendOverride){
+  SERVER_TREND = trendOverride || null;
+  DATA = rawData.map(normalizeRow);
+  allDates = [...new Set(DATA.map(d=>d.date))].sort();
+  today = allDates[allDates.length-1];
+  yday  = allDates.length>1 ? allDates[allDates.length-2] : today;
+  state.rangeStart = today;
+  state.rangeEnd = today;
+  const startInput = document.getElementById('rangeStart');
+  const endInput = document.getElementById('rangeEnd');
+  if(startInput){ startInput.min = allDates[0]; startInput.max = allDates[allDates.length-1]; }
+  if(endInput){ endInput.min = allDates[0]; endInput.max = allDates[allDates.length-1]; }
+  syncRangeInputs();
+  computePeriodData();
+  updatePeriodLabels();
+  renderAll();
+  renderTrendChart();
+}
+
+/* =========================================================
+   STATE — 권한(persona) + 필터
+   ========================================================= */
+const state = {
+  persona: 'hq',
+  store: 'all',
+  category: 'all',
+  source: 'all',
+  keyword: 'all', // 키워드 하이라이트 칩 클릭으로 토글 — 원문 리스트 드릴다운용
+  rangeStart: null, // initFromData에서 데이터의 마지막 날짜로 초기화됨
+  rangeEnd: null,
+  trendDays: 14,
+  yoy: false, // 전년 동기 겹쳐보기
+};
+
+// 실서비스에서는 하루 수천 건도 쌓일 수 있어 원문 리스트를 무제한으로 뿌리지 않고 상위 N건만 노출.
+// 나머지는 키워드/카테고리/매장 필터로 좁혀서 봐야 함 — 리스트 자체가 "전체 열람용"이 아니라 "드릴다운용".
+const RAWTEXT_LIST_CAP = 20;
+
+function scopeStores(){
+  // 본사는 실제 DATA에 존재하는 매장 전체(목업 8개든 실데이터 111개든 자동 대응).
+  // 지사 목록은 아직 매장↔지사 매핑표가 없어 데모용 고정 리스트를 씀 — 매핑표 확정 후 REGIONS를 실데이터 기준으로 교체 필요.
+  if(state.persona==='hq') return [...new Set(DATA.map(d=>d.store))];
+  return REGIONS[state.persona].stores;
+}
+
+function applyFilters(arr){
+  const stores = scopeStores();
+  return arr.filter(x=>{
+    if(!stores.includes(x.store)) return false;
+    if(state.store!=='all' && x.store!==state.store) return false;
+    if(state.category!=='all' && x.category!==state.category) return false;
+    if(state.source!=='all' && x.source!==state.source) return false;
+    if(state.keyword!=='all' && x.keyword!==state.keyword) return false;
+    return true;
+  });
+}
+// 히트맵은 카테고리·키워드 필터 영향을 받지 않고 항상 전체 분포를 보여준다 (클릭 = 필터 토글)
+function applyFiltersNoCat(arr){
+  const stores = scopeStores();
+  return arr.filter(x=>{
+    if(!stores.includes(x.store)) return false;
+    if(state.store!=='all' && x.store!==state.store) return false;
+    if(state.source!=='all' && x.source!==state.source) return false;
+    return true;
+  });
+}
+
+let trendChart=null, sourceDonut=null;
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function renderAll(){
+  const T = applyFilters(T_ALL);
+  const Y = applyFilters(Y_ALL);
+  const T_noCat = applyFiltersNoCat(T_ALL);
+
+  renderScopeNote();
+  renderFilterOptions();
+  renderActiveFilters();
+  renderKPI(T,Y);
+  renderPriorityPanel(T);
+  renderHeatmap(T_noCat);
+  renderAlert(T_noCat, applyFiltersNoCat(Y_ALL));
+  renderKeywords(T);
+  renderStoreHighlights(T);
+  renderRawTextLists(T,Y);
+  renderMenuPanel(T);
+  renderTracker(T,Y);
+  renderSourceDonut(T);
+}
+
+// "오늘 뭐부터 봐야하나"에 바로 답하기 위한 상단 액션 리스트 — 소스 불문 가장 급한 3건만 뽑아 보여준다
+function priorityScore(x){
+  if(SOURCE_GROUP[x.source]==='customer'){
+    if(x.response!=='미응대') return 0;
+    return 100 - (x.rating||0)*10; // 별점 낮을수록 급함
+  }
+  if(x.response==='보류' || x.response==='접수') return 90;
+  if(x.response==='처리중') return 70;
+  return 0;
+}
+function renderPriorityPanel(T){
+  const ranked = T.map(x=>({x, score:priorityScore(x)}))
+    .filter(r=>r.score>0)
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,3);
+  const panel = document.getElementById('priorityPanel');
+  if(!ranked.length){ panel.innerHTML=''; return; }
+  panel.innerHTML = `<div class="pp-title">🔥 오늘 먼저 볼 것 (미응대·미해결 상위 ${ranked.length}건)</div>` +
+    ranked.map((r,i)=>`
+      <div class="priority-item" data-id="${r.x.id}">
+        <div class="pi-left">
+          <span class="pi-rank">${i+1}</span>
+          <span class="rt-badge ${srcClass(r.x.source)}">${r.x.source}</span>
+          <span class="pi-store">${r.x.store}</span>
+          <span class="pi-snippet">${r.x.preview}</span>
+        </div>
+        <span class="pi-arrow">›</span>
+      </div>`).join('');
+  panel.querySelectorAll('.priority-item').forEach(el=>{
+    el.addEventListener('click', ()=> openModal(DATA.find(d=>d.id===el.dataset.id)));
+  });
+}
+
+function renderScopeNote(){
+  const stores = scopeStores();
+  const label = REGIONS[state.persona].label;
+  document.getElementById('scopeNote').innerHTML =
+    `현재 보고 있는 범위: <b>${label}</b> — 소속 매장 ${stores.length}개 (${stores.join(', ')})`;
+}
+
+function renderFilterOptions(){
+  const stores = scopeStores();
+  const storeSel = document.getElementById('storeFilter');
+  const prevStore = state.store;
+  storeSel.innerHTML = `<option value="all">매장 전체</option>` +
+    stores.map(s=>`<option value="${s}" ${s===prevStore?'selected':''}>${s}</option>`).join('');
+  if(!stores.includes(prevStore)) { state.store='all'; storeSel.value='all'; }
+
+  const catSel = document.getElementById('categoryFilter');
+  if(!catSel.dataset.built){
+    catSel.innerHTML = `<option value="all">카테고리 전체</option>` +
+      CATS.map(c=>`<option value="${c.key}">${c.sub} (${c.kr})</option>`).join('');
+    catSel.dataset.built='1';
+  }
+  catSel.value = state.category;
+  document.getElementById('sourceFilter').value = state.source;
+}
+
+function renderActiveFilters(){
+  const parts=[];
+  if(state.store!=='all') parts.push(`매장:${state.store}`);
+  if(state.category!=='all') parts.push(`카테고리:${CATS.find(c=>c.key===state.category).sub}`);
+  if(state.source!=='all') parts.push(`소스:${state.source}`);
+  if(state.keyword!=='all') parts.push(`키워드:${state.keyword}`);
+  document.getElementById('activeFilters').textContent = parts.length ? `적용 중 — ${parts.join(' · ')}` : '';
+}
+
+function renderKPI(T,Y){
+  const totalT=T.length, totalY=Y.length;
+  const avgT=avgRating(T), avgY=avgRating(Y);
+  const critT=criticalRate(T), critY=criticalRate(Y);
+  const noRespT=noResponse(T), noRespY=noResponse(Y);
+  const leadT=avgLeadtime(T), leadY=avgLeadtime(Y);
+
+  const kpis = [
+    {label:'총 VOC 건수', value:`${totalT}건`, delta:deltaTag(totalT, totalY, {higherIsBad:false})},
+    {label:'평균 별점', value:`${avgT.toFixed(2)}<span>점</span>`, delta:deltaTag(avgT, avgY, {higherIsBad:false, unit:'점'})},
+    {label:'크리티컬 비율 (1~3점)', value:`${critT.toFixed(1)}<span>%</span>`, delta:deltaTag(critT, critY, {higherIsBad:true, unit:'%'})},
+    {label:'미응대 건수', value:`${noRespT}건`, delta:deltaTag(noRespT, noRespY, {higherIsBad:true})},
+    {label:'평균 CS 처리 리드타임', value: leadT!=null ? `${leadT.toFixed(1)}<span>시간</span>` : '-', delta: leadT!=null && leadY!=null ? deltaTag(leadT, leadY, {higherIsBad:true, unit:'시간'}) : null},
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
+    <div class="kpi">
+      <div class="k-label">${k.label}</div>
+      <div class="k-value">${k.value}</div>
+      ${k.delta ? `<div class="k-delta ${k.delta.cls}">${k.delta.html}</div>` : `<div class="k-note">오늘 응대완료 건 기준</div>`}
+    </div>
+  `).join('');
+}
+
+function renderHeatmap(T_noCat){
+  const catStats = CATS.map(c=>{
+    const items = T_noCat.filter(x=>x.category===c.key);
+    const neg = items.filter(x=>x.sentiment==='부정').length;
+    const pos = items.filter(x=>x.sentiment==='긍정').length;
+    const total = items.length;
+    const negRate = total? neg/total*100 : 0;
+    return {...c, total, neg, pos, negRate};
+  });
+  document.getElementById('heatmapGrid').innerHTML = catStats.map(c=>{
+    const flag = c.total>=3 && c.negRate>=50;
+    const selected = state.category===c.key;
+    const negPct = c.total? (c.neg/c.total*100):0;
+    const posPct = c.total? (c.pos/c.total*100):0;
+    return `
+    <div class="cat-tile ${flag?'flag':''} ${selected?'selected':''}" data-cat="${c.key}">
+      ${flag?'<div class="cat-flag-badge">이상신호</div>':''}
+      <div class="cat-eng">${c.kr}</div>
+      <div class="cat-kr">${c.sub}</div>
+      <div class="cat-bar">
+        <div class="neg" style="width:${negPct}%"></div>
+        <div class="pos" style="width:${posPct}%"></div>
+      </div>
+      <div class="cat-nums"><span>총 <b>${c.total}</b>건</span><span>부정 <b>${c.neg}</b></span></div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.cat-tile').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const key = el.dataset.cat;
+      state.category = (state.category===key) ? 'all' : key;
+      renderAll();
+    });
+  });
+}
+
+function renderAlert(T_noCat, Y_noCat){
+  const catStats = CATS.map(c=>{
+    const items = T_noCat.filter(x=>x.category===c.key);
+    const neg = items.filter(x=>x.sentiment==='부정').length;
+    const total = items.length;
+    return {...c, total, neg, negRate: total? neg/total*100:0};
+  });
+  const alertBox = document.getElementById('alertBox');
+  const topFlag = catStats.filter(c=>c.total>=3).sort((a,b)=>b.negRate-a.negRate)[0];
+  if(topFlag && topFlag.negRate>=50){
+    const ydayItems = Y_noCat.filter(x=>x.category===topFlag.key && x.sentiment==='부정').length;
+    const todayItems = topFlag.neg;
+    const growth = ydayItems>0 ? Math.round((todayItems-ydayItems)/ydayItems*100) : 100;
+    const noResp = T_noCat.filter(x=>x.category===topFlag.key && x.response==='미응대').length;
+    alertBox.innerHTML = `
+      <div>
+        <div class="label">오늘의 이상 신호</div>
+        <div class="msg">${topFlag.sub}(${topFlag.kr}) 카테고리 부정 언급 집중</div>
+        <div class="sub">전일 ${ydayItems}건 → 오늘 ${todayItems}건 · 미응대 ${noResp}건 포함</div>
+      </div>
+      <div class="stat">+${growth}%</div>
+    `;
+  } else {
+    alertBox.innerHTML = `<div><div class="label">오늘의 이상 신호</div><div class="msg">특이 이상 신호 없음</div></div>`;
+  }
+}
+
+function topKeywords(arr, sentiment, n=5){
+  const map = {};
+  arr.filter(x=>x.sentiment===sentiment).forEach(x=>{ map[x.keyword]=(map[x.keyword]||0)+1; });
+  return Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+function renderKeywords(T){
+  const negKw = topKeywords(T,'부정');
+  const posKw = topKeywords(T,'긍정');
+  const chip = (k,v,cls) => `<span class="chip ${cls} ${state.keyword===k?'selected':''}" data-kw="${k}">${k} <span class="n">${v}</span></span>`;
+  document.getElementById('keywordPanel').innerHTML = `
+    <div class="kw-block">
+      <div class="kw-h">부정 키워드 TOP <span style="font-weight:400;text-transform:none;">— 클릭하면 아래 원문 리스트가 그 키워드로 좁혀집니다</span></div>
+      <div class="kw-chips">${negKw.map(([k,v])=>chip(k,v,'neg')).join('') || '<span class="kw-h">데이터 없음</span>'}</div>
+    </div>
+    <div class="kw-block">
+      <div class="kw-h">긍정 키워드 TOP</div>
+      <div class="kw-chips">${posKw.map(([k,v])=>chip(k,v,'pos')).join('') || '<span class="kw-h">데이터 없음</span>'}</div>
+    </div>
+  `;
+  document.getElementById('keywordPanel').querySelectorAll('.chip').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const k = el.dataset.kw;
+      state.keyword = (state.keyword===k) ? 'all' : k;
+      renderAll();
+    });
+  });
+}
+
+function renderStoreHighlights(T){
+  const storeNames = scopeStores();
+  const storeScores = storeNames.map(name=>{
+    const items = T.filter(x=>x.store===name);
+    const r = rated(items);
+    const avg = r.length? r.reduce((s,x)=>s+x.rating,0)/r.length : null;
+    const negItems = items.filter(x=>x.sentiment==='부정');
+    const negCount = negItems.length;
+    const unresolved = items.filter(x=>x.response==='미응대'||x.response==='접수'||x.response==='처리중').length;
+    // 원문 다양성(문안 가산) — 서로 다른 부정 키워드가 많을수록 "한 가지 이슈"가 아니라 복합적 문제로 판단해 더 무겁게 감점
+    const negKeywordVariety = new Set(negItems.map(x=>x.keyword)).size;
+    // 평균 별점(숫자) 비중은 낮추고, 실제 원문/문안에서 나오는 신호(부정건수·미해결·키워드 다양성)에 가산을 더 준 선정기준 (2026-08-12 조정)
+    const score = (avg||3)*10 - negCount*14 - unresolved*10 - negKeywordVariety*6;
+    return {name, avg, negCount, unresolved, negKeywordVariety, total: items.length, score};
+  }).filter(s=>s.total>0);
+
+  const good = [...storeScores].sort((a,b)=>b.score-a.score).slice(0,3);
+  const watch = [...storeScores].sort((a,b)=>a.score-b.score).slice(0,3);
+  const listEl = document.getElementById('storeList');
+  if(!storeScores.length){ listEl.innerHTML = `<li style="justify-content:center;color:var(--slate);">현재 필터에 해당하는 매장 데이터가 없습니다</li>`; return; }
+  listEl.innerHTML = `
+    <div class="store-group-label">우수 매장</div>
+    ${good.map(s=>`
+      <li data-store="${s.name}">
+        <div><div class="s-name">${s.name}</div><div class="s-detail">평균 ${s.avg?s.avg.toFixed(1):'-'}점 · 오늘 ${s.total}건</div></div>
+        <span class="store-tag good">GOOD</span><span class="s-arrow">›</span>
+      </li>`).join('')}
+    <div class="store-group-label">주의 매장</div>
+    ${watch.map(s=>`
+      <li data-store="${s.name}">
+        <div><div class="s-name">${s.name}</div><div class="s-detail">부정 ${s.negCount}건(키워드 ${s.negKeywordVariety}종) · 미해결 ${s.unresolved}건</div></div>
+        <span class="store-tag watch">WATCH</span><span class="s-arrow">›</span>
+      </li>`).join('')}
+  `;
+  // 매장명을 클릭하면 그 매장으로 필터가 걸리고 VOC 원문 리스트로 스크롤 — "내용을 바로 볼 수 있게"
+  listEl.querySelectorAll('li[data-store]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      state.store = el.dataset.store;
+      renderAll();
+      document.querySelector('.rawtext-split')?.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+}
+
+// 고객이 남긴 VOC(배달앱리뷰·QR설문) vs 점주/가맹점이 남긴 VOC(점주VOC·발주고) — 서로 성격이 달라 화면도 분리해서 보여준다
+// 소셜·커뮤니티는 고객이 쓴 글이라 고객 쪽에 넣는다. 다만 자사 채널이 아니라 외부 공개글이고
+// 볼륨이 작아(매장당 1~2건) 개별 건의 무게가 다르다. 배지 색으로 구분한다.
+const SOURCE_GROUP = { '배달앱리뷰':'customer', 'QR설문':'customer', '소셜·커뮤니티':'customer', '점주VOC':'owner', '발주고':'owner' };
+
+function renderRawTextLists(T,Y){
+  const customer = T.filter(x=> SOURCE_GROUP[x.source]==='customer');
+  const owner = T.filter(x=> SOURCE_GROUP[x.source]==='owner');
+  const ownerY = Y.filter(x=> SOURCE_GROUP[x.source]==='owner');
+  document.getElementById('rtCustomerTitle').textContent = `고객 VOC 원문 (${customer.length}건)`;
+  document.getElementById('rtOwnerTitle').textContent = `점주·가맹 VOC 원문 (${owner.length}건)`;
+  // 고객 VOC: 리뷰라서 별점·감성순으로 정렬해 보여줌
+  renderRawTextGroup(customer, 'rawTextListCustomer', 'rating');
+  // 점주·가맹 VOC: 별점이 없는 문의/이슈 성격이라 처리상태(미해결 먼저)순으로 보여주고, 전용 요약 지표도 별도 계산
+  renderRawTextGroup(owner, 'rawTextListOwner', 'status');
+  renderOwnerSummary(owner, ownerY);
+}
+
+function renderOwnerSummary(owner, ownerY){
+  const total = owner.length, totalY = ownerY.length;
+  const unresolved = owner.filter(x=> x.response==='접수'||x.response==='처리중'||x.response==='보류').length;
+  const done = owner.filter(x=> x.response==='완료').length;
+  const doneRate = total ? (done/total*100) : 0;
+  const baljugoCount = owner.filter(x=>x.source==='발주고').length;
+  const ownerVocCount = owner.filter(x=>x.source==='점주VOC').length;
+
+  const tiles = [
+    {label:'가맹 문의 건수', value:`${total}건`, delta: deltaTag(total, totalY, {higherIsBad:false})},
+    {label:'미해결', value:`${unresolved}건`},
+    {label:'처리완료율', value:`${doneRate.toFixed(0)}%`},
+    {label:'발주고 / 점주VOC', value:`${baljugoCount} / ${ownerVocCount}`},
+  ];
+  document.getElementById('ownerKpiRow').innerHTML = tiles.map(t=>`
+    <div class="mini-kpi">
+      <div class="mk-label">${t.label}</div>
+      <div class="mk-value">${t.value}</div>
+      ${t.delta ? `<div class="k-delta ${t.delta.cls}" style="margin-top:6px;">${t.delta.html}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderRawTextGroup(items, elId, mode){
+  let sorted;
+  if(mode==='status'){
+    const statusRank = {'보류':0, '접수':1, '처리중':2, '완료':3};
+    sorted = [...items].sort((a,b)=> (statusRank[a.response]??1) - (statusRank[b.response]??1) || (a.store>b.store?1:-1));
+  } else {
+    const sentimentRank = {'부정':0,'중립':1,'긍정':2};
+    sorted = [...items].sort((a,b)=> (sentimentRank[a.sentiment]-sentimentRank[b.sentiment]) || (a.store>b.store?1:-1));
+  }
+  const listEl = document.getElementById(elId);
+  if(!sorted.length){ listEl.innerHTML = `<div class="rt-empty">현재 필터에 해당하는 VOC 원문이 없습니다</div>`; return; }
+
+  // 실서비스 볼륨(하루 수천 건) 대비 무제한 렌더링 방지 — 상위 N건만 보여주고 나머지는 필터로 좁혀서 보게 함
+  const capped = sorted.slice(0, RAWTEXT_LIST_CAP);
+  const capNote = sorted.length > RAWTEXT_LIST_CAP
+    ? `<div class="rt-cap-note">상위 ${RAWTEXT_LIST_CAP}건 표시 중 · 전체 ${sorted.length}건 — 키워드·카테고리·매장 필터로 좁혀서 더 볼 수 있습니다</div>`
+    : '';
+
+  listEl.innerHTML = capNote + capped.map(x=>`
+    <div class="rt-row" data-id="${x.id}">
+      <div class="rt-left">
+        <span class="rt-badge ${srcClass(x.source)}">${x.source}</span>
+        <span class="rt-store">${x.store}</span>
+        <span class="rt-snippet">${x.preview}</span>
+      </div>
+      <div class="rt-right">
+        ${mode==='rating'
+          ? (x.rating!=null ? `<span class="rt-rating">★ ${x.rating}</span>` : '')
+          : (x.response ? `<span class="rt-status ${x.response}">${x.response}</span>` : '')}
+        <span class="rt-arrow">›</span>
+      </div>
+    </div>
+  `).join('');
+  listEl.querySelectorAll('.rt-row').forEach(el=>{
+    el.addEventListener('click', ()=> openModal(DATA.find(d=>d.id===el.dataset.id)));
+  });
+}
+
+function renderMenuPanel(T){
+  const menuIssueMap = {};
+  T.filter(x=>x.sentiment==='부정' && x.menu).forEach(x=>{
+    menuIssueMap[x.menu] = (menuIssueMap[x.menu]||0)+1;
+  });
+  const menuTop = Object.entries(menuIssueMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('menuPanel').innerHTML = menuTop.length ? menuTop.map(([m,c])=>`
+    <div class="menu-row"><span class="m-text">${m}</span><span class="m-count">${c}건</span></div>
+  `).join('') : `<div class="menu-row"><span class="m-text">현재 필터 기준 부정 리뷰 중 메뉴 태그 없음</span></div>`;
+}
+
+function renderTracker(T,Y){
+  const critT = criticalRate(T);
+  const leadT = avgLeadtime(T);
+  const totalDeliveryReview = T.filter(x=>x.source==='배달앱리뷰').length;
+  const respondedReview = T.filter(x=>x.source==='배달앱리뷰' && x.response==='완료').length;
+  const cResponseRate = totalDeliveryReview ? (respondedReview/totalDeliveryReview*100) : 0;
+  const ownerVocDone = T.filter(x=>x.source==='점주VOC' && x.response==='완료').length;
+  const ownerVocTotal = T.filter(x=>x.source==='점주VOC').length;
+  const ownerVocRate = ownerVocTotal ? (ownerVocDone/ownerVocTotal*100) : 0;
+
+  const trackerRows = [
+    {name:'크리티컬 리뷰 비율', current:`${critT.toFixed(1)}%`, fill: Math.min(critT*4,100)},
+    {name:'CS 응대율 (배달앱 리뷰)', current: totalDeliveryReview? `${cResponseRate.toFixed(0)}%` : '-', fill: cResponseRate},
+    {name:'평균 CS 처리 리드타임', current: leadT!=null ? `${leadT.toFixed(1)}시간` : '-', fill: leadT!=null ? Math.max(0,100-leadT*10) : 0},
+    {name:'점주 VOC 처리 완료율', current: ownerVocTotal? `${ownerVocRate.toFixed(0)}%` : '-', fill: ownerVocRate},
+  ];
+  document.getElementById('trackerBody').innerHTML = trackerRows.map(r=>`
+    <tr>
+      <td class="t-name">${r.name}</td>
+      <td><span class="goal-pill">목표 미설정</span></td>
+      <td class="t-current">${r.current}</td>
+      <td><div class="track-bar-wrap"><div class="fill" style="width:${r.fill}%"></div></div></td>
+      <td style="color:var(--slate);font-size:12px;">Q&amp;A 확정 후 목표치 반영 예정</td>
+    </tr>
+  `).join('');
+}
+
+function renderSourceDonut(T){
+  const sources = ALL_SOURCES; // SOURCE_HEX에서 자동으로 가져와 소스 추가 시 여기를 또 고치지 않게 한다
+  const counts = sources.map(s=>T.filter(x=>x.source===s).length);
+  const colors = sources.map(s=>SOURCE_HEX[s]);
+
+  document.getElementById('donutLegend').innerHTML = sources.map((s,i)=>`
+    <div class="dl-item">
+      <span class="dl-name"><span class="dl-dot" style="background:${colors[i]}"></span>${s}</span>
+      <span class="dl-count">${counts[i]}건</span>
+    </div>
+  `).join('');
+
+  const ctx = document.getElementById('sourceDonut').getContext('2d');
+  const cfg = {
+    type:'doughnut',
+    data:{ labels:sources, datasets:[{ data:counts, backgroundColor:colors, borderWidth:2, borderColor:'#232e26' }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:(c)=>`${c.label}: ${c.raw}건`}} }
+    }
+  };
+  if(sourceDonut) sourceDonut.destroy();
+  sourceDonut = new Chart(ctx, cfg);
+}
+
+/**
+ * 브랜드별로 쪼개져 온 일별 집계를 날짜 하나로 합친다.
+ *
+ * 평균끼리 다시 평균 내면 틀린다. 건수가 100건인 브랜드와 8건인 브랜드의 별점을
+ * 똑같이 반씩 쳐주기 때문이다. 그래서 백엔드가 합계(ratingSum, critCount)를 보내주고
+ * 여기서 합계끼리 더한 뒤 마지막에 한 번만 나눈다.
+ * 목업 경로처럼 합계가 없는 데이터는 이미 합쳐진 것으로 보고 그대로 통과시킨다.
+ */
+function mergeTrendByDate(rows){
+  const hasSums = rows.some(r=>r.ratingSum!=null);
+  if(!hasSums) return [...rows].sort((a,b)=> a.date<b.date?-1:a.date>b.date?1:0);
+  const acc = {};
+  rows.forEach(r=>{
+    const a = acc[r.date] = acc[r.date] || {date:r.date, count:0, rated:0, sum:0, critCount:0};
+    a.count += Number(r.count)||0;
+    a.rated += Number(r.rated)||0;
+    a.sum += Number(r.ratingSum)||0;
+    a.critCount += Number(r.critCount)||0;
+  });
+  return Object.keys(acc).sort().map(d=>{
+    const a = acc[d];
+    return {
+      date: d,
+      count: a.count,
+      avg: a.rated ? a.sum / a.rated : 0,
+      crit: a.rated ? a.critCount / a.rated * 100 : 0,
+    };
+  });
+}
+
+/**
+ * 화면에 보이는 각 날짜의 "1년 전 같은 날"을 집계에서 찾아 짝지어 준다.
+ *
+ * 366일을 그대로 빼면 윤년에 하루가 어긋난다. 그래서 연도만 1 줄이고 월·일은 그대로 둔다.
+ * 2월 29일처럼 전년에 없는 날짜는 짝이 없으니 null로 남긴다(억지로 28일에 붙이지 않는다).
+ * 짝이 하나도 없으면 null을 돌려주고, 호출부가 "전년 데이터 없음"을 안내한다.
+ */
+function buildYoYSeries(allPoints, visible){
+  const byDate = {};
+  allPoints.forEach(p=>{ byDate[p.date] = p; });
+  const lastYear = d => (Number(d.slice(0,4))-1) + d.slice(4);
+
+  const counts = [], avgs = [];
+  let matched = 0;
+  visible.forEach(p=>{
+    const prev = byDate[lastYear(p.date)];
+    if(prev){ matched++; counts.push(prev.count); avgs.push(Number(prev.avg.toFixed(2))); }
+    else { counts.push(null); avgs.push(null); }
+  });
+  if(!matched) return null;
+
+  // 겹치는 구간만으로 합계를 비교한다. 짝 없는 날을 0으로 치면 전년이 실제보다 작아 보인다.
+  let cur=0, prevSum=0;
+  visible.forEach(p=>{
+    const prev = byDate[lastYear(p.date)];
+    if(prev){ cur += p.count; prevSum += prev.count; }
+  });
+  return {counts, avgs, matched, total:visible.length, cur, prev:prevSum};
+}
+
+function updateTrendCaption(yoy){
+  const el = document.getElementById('trendCaption');
+  if(!el) return;
+  const base = '※ 전사(본사) 기준 추이이며, 상단 필터·지사 선택의 영향을 받지 않습니다.';
+  if(!state.yoy){ el.textContent = base; return; }
+  if(!yoy){
+    el.textContent = base + ' 전년 같은 기간 집계가 아직 없어 비교선을 그리지 못했습니다.';
+    return;
+  }
+  const diff = yoy.prev ? ((yoy.cur - yoy.prev) / yoy.prev * 100) : null;
+  el.textContent = base
+    + ` 전년 대비: ${yoy.matched}/${yoy.total}일 짝지음, 건수 ${yoy.prev.toLocaleString()} → ${yoy.cur.toLocaleString()}`
+    + (diff==null ? '' : ` (${diff>=0?'+':''}${diff.toFixed(1)}%)`);
+}
+
+function renderTrendChart(){
+  const days = state.trendDays;
+  // 우선순위: ①백엔드가 rollupAndArchive()로 미리 집계해준 SERVER_TREND(원문 스캔 없이 가벼움, 몇 년치도 OK)
+  // ※ 아래 mergeTrendByDate가 브랜드별로 쪼개진 줄을 날짜 하나로 합친다.
+  // ②그게 없으면 지금 로드된 DATA에서 직접 집계(목업 모드 또는 트렌드 미제공 시) + 목업은 데모용 12일 가상 히스토리 추가
+  // 방어적 정렬 — 백엔드가 혹시 날짜순으로 안 보내도 여기서 한 번 더 보정
+  const real = SERVER_TREND ? mergeTrendByDate(SERVER_TREND) : buildTrendPoints(DATA);
+  const merged = (SERVER_TREND || DATA_ENDPOINT ? real : [...TREND_HISTORY, ...real]);
+  const full = merged.slice(-days);
+  const labels = full.map(d=> d.date.slice(5).replace('-','.'));
+
+  const datasets = [
+    { type:'bar', label:'VOC 건수', data:full.map(d=>d.count), backgroundColor:'rgba(240,232,210,0.16)', borderRadius:4, yAxisID:'yCount', order:4 },
+    { type:'line', label:'평균 별점', data:full.map(d=>Number(d.avg.toFixed(2))), borderColor:'rgba(240,232,210,0.75)', backgroundColor:'rgba(240,232,210,0.75)', yAxisID:'yRating', tension:.35, pointRadius:3, borderWidth:2, order:1 },
+    { type:'line', label:'크리티컬 비율(%)', data:full.map(d=>Number(d.crit.toFixed(1))), borderColor:'#e46f56', backgroundColor:'#e46f56', borderDash:[5,4], yAxisID:'yCrit', tension:.35, pointRadius:3, borderWidth:2, order:2 },
+  ];
+
+  // 전년 동기 겹쳐보기. 원문은 보관 기간만 남지만 집계는 영구라 여기서 1년 전을 꺼낼 수 있다.
+  const yoy = state.yoy ? buildYoYSeries(merged, full) : null;
+  if(yoy){
+    datasets.push({
+      type:'bar', label:'전년 건수', data:yoy.counts,
+      backgroundColor:'rgba(240,232,210,0.06)', borderRadius:4, yAxisID:'yCount', order:5,
+    });
+    datasets.push({
+      type:'line', label:'전년 평균 별점', data:yoy.avgs,
+      borderColor:'rgba(240,232,210,0.34)', backgroundColor:'rgba(240,232,210,0.34)',
+      borderDash:[2,3], yAxisID:'yRating', tension:.35, pointRadius:0, borderWidth:1.5, order:3,
+    });
+  }
+  updateTrendCaption(yoy);
+
+  const cfg = {
+    data:{
+      labels,
+      datasets,
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index', intersect:false},
+      plugins:{ legend:{position:'top', align:'end', labels:{boxWidth:12, font:{size:11.5}}} },
+      scales:{
+        x:{ grid:{display:false} },
+        yCount:{ position:'left', beginAtZero:true, title:{display:true,text:'건수',font:{size:11}}, grid:{color:'rgba(240,232,210,0.10)'} },
+        yRating:{ position:'right', min:0, max:5, title:{display:true,text:'평균 별점',font:{size:11}}, grid:{drawOnChartArea:false} },
+        yCrit:{ position:'right', min:0, max:100, title:{display:true,text:'크리티컬 %',font:{size:11},color:'#e46f56'}, ticks:{color:'#e46f56',font:{size:10}}, grid:{drawOnChartArea:false} },
+      }
+    }
+  };
+  if(trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById('trendChart').getContext('2d'), cfg);
+}
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+function openModal(item){
+  if(!item) return;
+  const tags = document.getElementById('modalTags');
+  tags.innerHTML = `
+    <span class="modal-tag" style="background:${item.sentiment==='부정'?'var(--chili-soft)':item.sentiment==='긍정'?'var(--mint-soft)':'#F1F0F6'};color:${item.sentiment==='부정'?'var(--chili)':item.sentiment==='긍정'?'var(--mint)':'var(--slate)'};">${item.sentiment}</span>
+    <span class="modal-tag" style="background:#F1F0F6;color:var(--ink-soft);">${item.source}</span>
+    <span class="modal-tag" style="background:#F1F0F6;color:var(--ink-soft);">${CATS.find(c=>c.key===item.category)?.sub||item.category}</span>
+  `;
+  // 원문 전문이 이미 있으면 바로 보여주고, 없으면(실데이터 모드) 이 건만 따로 받아온다.
+  if(item.raw_text!=null && item.raw_text!==''){
+    renderModalText(item.raw_text, item.reply_text);
+  } else {
+    renderModalText(item.preview || '', '');
+    if(DATA_ENDPOINT) fetchDetail(item);
+  }
+  document.getElementById('modalMeta').innerHTML = `
+    <div><span>VOC ID</span><b>${item.id}</b></div>
+    <div><span>매장</span><b>${item.store} (${item.store_id})</b></div>
+    <div><span>일자</span><b>${item.date}</b></div>
+    <div><span>플랫폼</span><b>${item.platform||'-'}</b></div>
+    <div><span>별점</span><b>${item.rating!=null?item.rating+'점':'-'}</b></div>
+    <div><span>응대 상태</span><b>${item.response||'-'}</b></div>
+    <div><span>키워드</span><b>${item.keyword||'-'}</b></div>
+    <div><span>메뉴</span><b>${item.menu||'-'}</b></div>
+    ${item.url ? `<div style="grid-column:1/-1;"><span>원문 링크</span><b><a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color:var(--ocean);word-break:break-all;">${item.url}</a></b></div>` : ''}
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function renderModalText(rawText, replyText){
+  document.getElementById('modalRaw').textContent = rawText || '(원문 없음)';
+  const replyWrap = document.getElementById('modalReplyWrap');
+  if(replyText){ replyWrap.style.display='block'; document.getElementById('modalReply').textContent = replyText; }
+  else { replyWrap.style.display='none'; }
+}
+
+// 클릭한 한 건의 원문 전문만 따로 받아온다. 목록에는 60자 미리보기만 실려 오기 때문.
+// 받아온 전문은 DATA에 캐시해서 같은 건을 두 번 요청하지 않는다.
+function fetchDetail(item){
+  const rawEl = document.getElementById('modalRaw');
+  rawEl.textContent = (item.preview || '') + '\n\n원문을 불러오는 중…';
+  const cbName = '__vocDetail_' + Math.floor(Math.random()*1e9);
+  const scriptEl = document.createElement('script');
+  let done = false;
+  window[cbName] = function(payload){
+    done = true;
+    try{
+      const d = (payload && payload.detail && payload.detail[item.id]) || null;
+      if(d){
+        item.raw_text = d.raw_text;
+        item.reply_text = d.reply_text;
+        renderModalText(d.raw_text, d.reply_text);
+      } else {
+        rawEl.textContent = (item.preview || '') + '\n\n(원문을 찾지 못했습니다)';
+      }
+    } finally { delete window[cbName]; scriptEl.remove(); }
+  };
+  scriptEl.src = DATA_ENDPOINT + (DATA_ENDPOINT.includes('?') ? '&' : '?')
+    + 'mode=detail&ids=' + encodeURIComponent(item.id) + '&callback=' + cbName;
+  scriptEl.onerror = function(){
+    if(!done) rawEl.textContent = (item.preview || '') + '\n\n(원문 불러오기 실패 — 미리보기만 표시합니다)';
+    delete window[cbName]; scriptEl.remove();
+  };
+  document.body.appendChild(scriptEl);
+}
+
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', (e)=>{ if(e.target.id==='modalOverlay') closeModal(); });
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+document.querySelectorAll('.persona-pill').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.persona-pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.persona = btn.dataset.persona;
+    state.store = 'all';
+    renderAll();
+  });
+});
+document.getElementById('storeFilter').addEventListener('change', e=>{ state.store=e.target.value; renderAll(); });
+document.getElementById('categoryFilter').addEventListener('change', e=>{ state.category=e.target.value; renderAll(); });
+document.getElementById('sourceFilter').addEventListener('change', e=>{ state.source=e.target.value; renderAll(); });
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  state.store='all'; state.category='all'; state.source='all'; state.keyword='all';
+  renderAll();
+});
+
+function clearPeriodPresetActive(){
+  document.querySelectorAll('.period-presets button').forEach(b=>b.classList.remove('active'));
+}
+document.getElementById('rangeStart').addEventListener('change', e=>{
+  state.rangeStart = e.target.value;
+  if(state.rangeStart > state.rangeEnd) state.rangeEnd = state.rangeStart;
+  syncRangeInputs(); clearPeriodPresetActive();
+  computePeriodData(); updatePeriodLabels(); renderAll();
+});
+document.getElementById('rangeEnd').addEventListener('change', e=>{
+  state.rangeEnd = e.target.value;
+  if(state.rangeEnd < state.rangeStart) state.rangeStart = state.rangeEnd;
+  syncRangeInputs(); clearPeriodPresetActive();
+  computePeriodData(); updatePeriodLabels(); renderAll();
+});
+document.querySelectorAll('.period-presets button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    clearPeriodPresetActive();
+    btn.classList.add('active');
+    const preset = btn.dataset.preset;
+    const lastDate = allDates[allDates.length-1];
+    if(preset==='all'){ state.rangeStart = allDates[0]; }
+    else { const n = Number(preset); state.rangeStart = allDates[Math.max(0, allDates.length-n)]; }
+    state.rangeEnd = lastDate;
+    syncRangeInputs();
+    computePeriodData(); updatePeriodLabels(); renderAll();
+  });
+});
+document.getElementById('yoyToggle').addEventListener('click', ()=>{
+  state.yoy = !state.yoy;
+  document.getElementById('yoyToggle').classList.toggle('active', state.yoy);
+  renderTrendChart();
+});
+document.querySelectorAll('#periodToggle button[data-days]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#periodToggle button[data-days]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.trendDays = Number(btn.dataset.days);
+    renderTrendChart();
+  });
+});
+
+// 마지막 수집 시각과 오늘 유입 건수를 화면 맨 위에 박는다.
+// 자료가 안 들어온 걸 모르고 어제 숫자로 회의하는 "조용한 실패"를 막는 장치다.
+function renderSyncBadge(meta){
+  if(!meta) return;
+  const el = document.getElementById('syncBadge');
+  if(!el) return;
+  const zero = !meta.todayCount;
+  el.style.display = 'block';
+  el.className = 'sync-badge' + (zero ? ' warn' : '');
+  el.textContent = zero
+    ? `⚠️ 오늘 유입 0건 · 마지막 수집 ${meta.lastSync || '기록 없음'} · 보관 ${meta.totalRows}건 — 수집이 멈췄는지 확인하세요`
+    : `오늘 유입 ${meta.todayCount}건 · 마지막 수집 ${meta.lastSync || '기록 없음'} · 보관 ${meta.totalRows}건(최근 ${meta.retentionDays}일)`;
+}
+
+/**
+ * 경쟁사 활동량 랭킹. 데이터는 WATCHTOWER가 주 1회 RANKING 시트에 채운다.
+ * 아직 한 주도 안 쌓였으면(현재 상태) 빈 화면 대신 왜 비었는지를 적는다.
+ * 순위를 지어내지 않는다. 없으면 없다고 쓴다.
+ */
+function renderRanking(ranking){
+  const el = document.getElementById('rankingPanel');
+  if(!el) return;
+  if(!ranking || !ranking.length){
+    el.innerHTML = `<div class="rank-empty">
+      아직 적재된 주간 랭킹이 없습니다.
+      <b>WATCHTOWER</b>가 매주 월요일 10시에 3개 사다리(아구찜·해물찜 / 미역국·한식 / 생선구이·고등어)를 훑어
+      <b>RANKING</b> 시트를 채우면 여기에 표시됩니다.
+    </div>`;
+    return;
+  }
+  // 가장 최근 주차만 보여준다
+  const latest = ranking.map(r=>r.week).sort().slice(-1)[0];
+  const rows = ranking.filter(r=>r.week===latest);
+  const byLadder = {};
+  rows.forEach(r=>{ (byLadder[r.ladder] = byLadder[r.ladder] || []).push(r); });
+
+  const move = (r)=>{
+    if(r.prevRank==null) return '<span class="rank-move">NEW</span>';
+    const d = r.prevRank - r.rank;
+    if(d>0) return `<span class="rank-move up">▲${d}</span>`;
+    if(d<0) return `<span class="rank-move">▼${-d}</span>`;
+    return '<span class="rank-move">–</span>';
+  };
+
+  // 아직 훑지 않은 사다리는 지어내지 않고 "미측정"으로 남긴다
+  const ALL_LADDERS = ['아구찜·해물찜','미역국·한식','생선구이·고등어'];
+
+  // ref:true 는 순위에서 빼고 아래 참고영역에 따로 붙인다.
+  // 카테고리가 다른 브랜드(두찜=찜닭)를 같은 사다리에 세우면 순위가 무의미해지기 때문이다.
+  const rowHtml = (r)=>`<div class="rank-row ${r.isOwn?'own':''}" ${r.note?`title="${r.note}"`:''}>
+    <span class="rank-no">${r.ref?'—':String(r.rank).padStart(2,'0')}</span>
+    <span class="rank-name">${r.name}</span>
+    <span class="rank-score">${r.score}</span>
+    ${r.ref?'<span class="rank-move">참고</span>':move(r)}
+  </div>`;
+
+  el.innerHTML = `<div class="rank-ladders">` + ALL_LADDERS.map(ld=>{
+    const all = byLadder[ld]||[];
+    if(!all.length){
+      return `<div class="rank-ladder">
+        <h3>${ld}</h3>
+        <div class="rank-row" style="color:var(--c-fg-3);">아직 측정하지 않았습니다</div>
+      </div>`;
+    }
+    const ranked = all.filter(r=>!r.ref).sort((a,b)=>a.rank-b.rank);
+    const refs   = all.filter(r=>r.ref);
+    return `<div class="rank-ladder">
+      <h3>${ld}</h3>
+      ${ranked.map(rowHtml).join('')}
+      ${refs.length ? `<div class="rank-ref">
+        <div class="rank-ref-label">참고 · 카테고리 다름</div>
+        ${refs.map(rowHtml).join('')}
+      </div>` : ''}
+    </div>`;
+  }).join('') + `</div>
+  <p class="sec-caption" style="margin-top:10px;">
+    기준 주차 ${latest} · 숫자는 최근 7일(08-18~08-24) 네이버 블로그 언급 건수, 브랜드명 정확일치
+    · <b>+</b>가 붙은 값은 하한입니다 · 행에 마우스를 올리면 단서가 뜹니다
+  </p>`;
+}
+
+/* ---------- 초기 렌더 & 실데이터 연동 ---------- */
+initFromData(MOCK_DATA); // 먼저 목업으로 즉시 렌더(빈 화면 방지), 실데이터 로드되면 자동 교체됨
+
+/**
+ * 경쟁사 활동량 — 2026-08-24 네이버 블로그를 실제로 훑어 만든 값이다(지어낸 수치가 아니다).
+ *
+ * 측정 방법: 브랜드명으로 블로그를 날짜순 검색해 최근 7일(08-18~08-24) 글을 세되,
+ * 브랜드명이 띄어쓰기 없이 붙어 나온 글만 센다. "인생 아구찜을 만났습니다"처럼
+ * 브랜드가 아니라 "인생 최고의"라는 뜻으로 쓴 글이 절반 가까이 섞여서다.
+ *
+ * 한계 세 가지를 note에 적어 둔다:
+ *  - 글이 많은 브랜드는 한 번에 가져오는 건수 제한에 걸려 하한값이다(실제로는 더 많다).
+ *  - 이름이 일반명사인 브랜드(1등아구찜)는 검색으로 분리가 안 된다.
+ *  - 블로그 한 채널만 봤다. WATCHTOWER 정식 산식은 뉴스·카페·유튜브까지 합산한다.
+ */
+const W = '2026-08-24';
+const REAL_RANKING = [
+  /* --- 아구찜·해물찜 : 자사 1위. 다만 사다리 전체가 조용하다 --- */
+  {week:W, ladder:'아구찜·해물찜', name:'인생아구찜',       isOwn:true,  rank:1, prevRank:null, score:'9',   note:'오탐 제거 후 9건. 사다리 1위'},
+  {week:W, ladder:'아구찜·해물찜', name:'김영희아구찜',     isOwn:false, rank:2, prevRank:null, score:'7',   note:'코다리냉면 병기 매장 포함'},
+  {week:W, ladder:'아구찜·해물찜', name:'아구듬뿍알곤마니', isOwn:false, rank:3, prevRank:null, score:'5+',  note:'하한값. 가져온 5건이 전부 최근 7일'},
+  {week:W, ladder:'아구찜·해물찜', name:'행운아구찜',       isOwn:false, rank:4, prevRank:null, score:'5',   note:'3일에 5건 집중. 신메뉴 묵은지아구찜 체험단 푸시 중'},
+  {week:W, ladder:'아구찜·해물찜', name:'싸다아구찜',       isOwn:false, rank:5, prevRank:null, score:'3',   note:''},
+  {week:W, ladder:'아구찜·해물찜', name:'아구찜참잘하는집', isOwn:false, rank:6, prevRank:null, score:'0',   note:'최근 글이 07-31, 24일째 무활동'},
+  {week:W, ladder:'아구찜·해물찜', name:'1등아구찜',        isOwn:false, rank:7, prevRank:null, score:'n/a', note:'측정 불가. 이름이 "1등 맛집" 수식어와 구분되지 않음'},
+  {week:W, ladder:'아구찜·해물찜', name:'두찜',             isOwn:false, rank:0, prevRank:null, score:'50+', ref:true,
+   note:'찜닭 프랜차이즈. 아구찜 사다리에 세우면 항상 1위라 순위에서 제외하고 참고로만 둔다'},
+
+  /* --- 미역국·한식 : 자사가 밑에서 두 번째. 상위 두 곳이 체험단을 돌리고 있다 --- */
+  {week:W, ladder:'미역국·한식', name:'보돌미역',     isOwn:false, rank:1, prevRank:null, score:'18',  note:'합정·청주오송·판교운중·시흥은계·광교·원주·경주 등 7개 지역 동시 노출'},
+  {week:W, ladder:'미역국·한식', name:'팔도미역',     isOwn:false, rank:2, prevRank:null, score:'17',  note:'17건 중 11건이 부산 명지점 한 곳. 무작위 아이디 블로거 다수 — 신규점 체험단'},
+  {week:W, ladder:'미역국·한식', name:'일호점미역',   isOwn:false, rank:3, prevRank:null, score:'7',   note:'수원점·미사점 중심'},
+  {week:W, ladder:'미역국·한식', name:'풍원장미역국', isOwn:false, rank:4, prevRank:null, score:'1',   note:'부산 마린시티 편중. 08-17 이후 사실상 멈춤'},
+  {week:W, ladder:'미역국·한식', name:'삼대미역',     isOwn:true,  rank:5, prevRank:null, score:'0',   note:'최근 글 08-14(보일러 시공업체 블로그). 실제 리뷰는 08-09가 마지막 — 15일째 무활동'},
+  {week:W, ladder:'미역국·한식', name:'서청미역',     isOwn:false, rank:6, prevRank:null, score:'0',   note:'최근 글 08-11, 13일째 무활동'},
+
+  /* --- 생선구이·고등어 : 사다리 전체가 과열. 자사만 0 --- */
+  {week:W, ladder:'생선구이·고등어', name:'달빛에구운고등어', isOwn:false, rank:1, prevRank:null, score:'100+', note:'하한값. 98번째 글도 아직 7일 안. 하루 20건꼴 — 전국 규모 블로그 물량전'},
+  {week:W, ladder:'생선구이·고등어', name:'화덕으로간고등어', isOwn:false, rank:2, prevRank:null, score:'60+',  note:'하한값. 08-24 하루에만 8건 이상. 당진·의왕·부산·수원·시흥 동시'},
+  {week:W, ladder:'생선구이·고등어', name:'산으로간고등어',   isOwn:false, rank:3, prevRank:null, score:'24',   note:'용인 수지 단일 매장. 웨이팅·오픈런 후기 중심 — 물량이 아니라 실수요'},
+  {week:W, ladder:'생선구이·고등어', name:'북극해고등어',     isOwn:false, rank:4, prevRank:null, score:'22',   note:'22건 중 8건이 양주고읍점. 송도·속초 신규점 노출도 진행 중'},
+  {week:W, ladder:'생선구이·고등어', name:'백년고등어1750',   isOwn:false, rank:5, prevRank:null, score:'14+',  note:'하한값. 수유본점·신동탄·김포구래'},
+  {week:W, ladder:'생선구이·고등어', name:'바다를먹은고등어', isOwn:false, rank:6, prevRank:null, score:'8+',   note:'하한값. 광교 갤러리아점 편중. 오탐 2건 제외한 수치'},
+  {week:W, ladder:'생선구이·고등어', name:'반궁',             isOwn:false, rank:7, prevRank:null, score:'8',    note:'NC강서점 중심. "생선구이 프랜차이즈" 키워드로 가맹 홍보 성격'},
+  {week:W, ladder:'생선구이·고등어', name:'고래식당',         isOwn:false, rank:8, prevRank:null, score:'2',    note:'문래점 기준. 동명의 하동 백반집과 섞여 오탐 주의'},
+  {week:W, ladder:'생선구이·고등어', name:'선굼터',           isOwn:false, rank:9, prevRank:null, score:'1',    note:'목포·익산·서교동. 08-19 이후 없음'},
+  {week:W, ladder:'생선구이·고등어', name:'어화락',           isOwn:true,  rank:10,prevRank:null, score:'0',    note:'최근 글 08-13. 08-11~13에 민어찜 체험단 7건이 몰렸다가 그 뒤로 완전 정지 — 11일째 무활동'},
+];
+renderRanking(REAL_RANKING);
+
+if(DATA_ENDPOINT){
+  const cbName = '__vocLoad_' + Math.floor(Math.random()*1e9);
+  window[cbName] = function(payload){
+    // 신형 백엔드: {items, trend, meta} 객체. 구형/직접 배열을 보낼 경우도 안전하게 처리.
+    try{
+      if(Array.isArray(payload)) initFromData(payload);
+      else {
+        initFromData(payload.items || [], payload.trend || null);
+        renderSyncBadge(payload.meta);
+        renderRanking(payload.ranking);
+      }
+    }
+    finally{ delete window[cbName]; scriptEl.remove(); }
+  };
+  const scriptEl = document.createElement('script');
+  scriptEl.src = DATA_ENDPOINT + (DATA_ENDPOINT.includes('?') ? '&' : '?') + 'callback=' + cbName;
+  scriptEl.onerror = function(){ console.warn('[VOC] 실데이터 로드 실패 — 목업 데이터로 표시합니다.'); };
+  document.body.appendChild(scriptEl);
+}
+</script>
+</body>
+</html>

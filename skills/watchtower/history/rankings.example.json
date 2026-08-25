@@ -1,0 +1,60 @@
+{
+  "_note": "주간 활동량 랭킹 스냅샷. weeks[]에 월요일 날짜로 append 한다. 변동 화살표(▲▼)는 직전 주 같은 ladder의 rank와 비교해 계산하며, 기억이나 추정으로 붙이지 않는다. 아래는 2주치 예시 — 2주가 있어야 화살표 계산이 어떻게 되는지 보인다.",
+  "weeks": [
+    {
+      "week_of": "2026-08-17",
+      "ladders": [
+        {
+          "id": "agujjim",
+          "label": "아구찜·해물찜",
+          "entries": [
+            { "rank": 1, "name": "인생아구찜",       "is_own": true,  "score": 12, "stores": 41, "note": "" },
+            { "rank": 2, "name": "김영희아구찜",     "is_own": false, "score": 8,  "stores": 27, "note": "" },
+            { "rank": 3, "name": "행운아구찜",       "is_own": false, "score": 2,  "stores": 15, "note": "" },
+            { "rank": 4, "name": "아구듬뿍알곤마니", "is_own": false, "score": 2,  "stores": 9,  "note": "" },
+            { "rank": 5, "name": "싸다아구찜",       "is_own": false, "score": 1,  "stores": 12, "note": "" },
+            { "rank": 6, "name": "아구찜참잘하는집", "is_own": false, "score": 0,  "stores": 6,  "note": "조용했음" },
+            { "rank": 7, "name": "1등아구찜",        "is_own": false, "score": 0,  "stores": null, "note": "측정 불가 — 브랜드명이 '1등 맛집' 수식어와 구분되지 않음" }
+          ],
+          "reference_only": [
+            { "name": "두찜", "score": 44, "note": "찜닭 프랜차이즈. 카테고리가 달라 순위에서 제외" }
+          ]
+        }
+      ]
+    },
+    {
+      "week_of": "2026-08-24",
+      "ladders": [
+        {
+          "id": "agujjim",
+          "label": "아구찜·해물찜",
+          "entries": [
+            { "rank": 1, "name": "인생아구찜",       "is_own": true,  "score": 9,  "stores": 41, "note": "오탐 제거 후 9건" },
+            { "rank": 2, "name": "김영희아구찜",     "is_own": false, "score": 7,  "stores": 27, "note": "" },
+            { "rank": 3, "name": "아구듬뿍알곤마니", "is_own": false, "score": 5,  "stores": 10, "note": "하한값. 출점 +1" },
+            { "rank": 4, "name": "행운아구찜",       "is_own": false, "score": 5,  "stores": 15, "note": "3일에 5건 집중 — 신메뉴 체험단 푸시 중" },
+            { "rank": 5, "name": "싸다아구찜",       "is_own": false, "score": 3,  "stores": 12, "note": "" },
+            { "rank": 6, "name": "아구찜참잘하는집", "is_own": false, "score": 0,  "stores": 6,  "note": "2주째 무활동 — 하위 접기 대상" },
+            { "rank": 7, "name": "1등아구찜",        "is_own": false, "score": 0,  "stores": null, "note": "측정 불가" }
+          ],
+          "reference_only": [
+            { "name": "두찜", "score": 50, "note": "하한값. 찜닭 프랜차이즈라 순위 제외" }
+          ]
+        },
+        {
+          "id": "miyeok",
+          "label": "미역국·한식",
+          "entries": [
+            { "rank": 1, "name": "보돌미역",     "is_own": false, "score": 18, "stores": 31, "note": "7개 지역 동시 노출" },
+            { "rank": 2, "name": "팔도미역",     "is_own": false, "score": 17, "stores": 24, "note": "17건 중 11건이 단일 신규점 — 체험단" },
+            { "rank": 3, "name": "일호점미역",   "is_own": false, "score": 7,  "stores": 8,  "note": "" },
+            { "rank": 4, "name": "풍원장미역국", "is_own": false, "score": 1,  "stores": 11, "note": "" },
+            { "rank": 5, "name": "삼대미역",     "is_own": true,  "score": 0,  "stores": 7,  "note": "실제 리뷰 마지막 08-09 — 15일째 무활동" },
+            { "rank": 6, "name": "서청미역",     "is_own": false, "score": 0,  "stores": 9,  "note": "조용했음" }
+          ],
+          "reference_only": []
+        }
+      ]
+    }
+  ]
+}

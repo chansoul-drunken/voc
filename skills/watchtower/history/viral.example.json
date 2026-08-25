@@ -1,0 +1,27 @@
+{
+  "_note": "이미 보고한 바이럴 건. 70점 이상만 리포트에 싣고, 여기 있는 건은 제외한다. score는 확산 가속도 기준 — 절대 조회수가 아니라 시간당 증가율을 본다.",
+  "items": [
+    {
+      "id": "2026-08-19-yt-a1",
+      "reported_at": "2026-08-19",
+      "platform": "유튜브",
+      "brand": "(경쟁사)",
+      "score": 78,
+      "title": "생선구이 프랜차이즈 원가 공개",
+      "url": "https://example.com/watch?v=EXAMPLE1",
+      "sentiment": "부정",
+      "note": "48시간 만에 12만 조회. 자사 언급 없음 — 카테고리 전반 이슈"
+    },
+    {
+      "id": "2026-08-24-cm-b2",
+      "reported_at": "2026-08-24",
+      "platform": "커뮤니티",
+      "brand": "인생아구찜",
+      "score": 71,
+      "title": "여기 양 줄었다는데 사실인가요",
+      "url": "https://example.com/community/EXAMPLE2",
+      "sentiment": "부정",
+      "note": "댓글 240개. 후속 전개 시 '후속:'으로만 추가"
+    }
+  ]
+}

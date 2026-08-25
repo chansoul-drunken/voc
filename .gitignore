@@ -1,0 +1,29 @@
+# 실제 운영 설정 — example 파일만 커밋한다
+skills/watchtower/config.json
+skills/brand-metrics/keywords.local.json
+
+# 상태 파일 실측값 — example 파일만 커밋한다
+skills/watchtower/history/*.json
+!skills/watchtower/history/*.example.json
+
+# 산출물
+skills/watchtower/reports/
+skills/brand-metrics/data/
+output/
+
+# 내부 심의 기록
+docs/panel-review_*.md
+docs/council_*.md
+
+# 에이전트 작업 흔적
+_workspace/
+.claude/settings.local.json
+
+# OS / 편집기
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+__pycache__/
+*.pyc

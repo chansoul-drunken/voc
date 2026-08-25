@@ -1,0 +1,51 @@
+{
+  "_comment": "브랜드별 키워드·노이즈 필터 정의. 수집 전 여기부터 손본다.",
+  "week_start": "monday",
+  "timezone": "Asia/Seoul",
+  "brands": [
+    {
+      "id": "insaeng",
+      "name": "인생아구찜",
+      "datalab_keywords": ["인생아구찜", "인생 아구찜"],
+      "doc_query": "인생아구찜",
+      "include_any": ["인생아구찜", "인생 아구찜"],
+      "exclude_any": [
+        "인생 아구찜을", "인생 아구찜이", "인생아구찜이었", "인생 아구찜이었",
+        "인생아구찜맛집", "소문난마산", "고향아구찜", "군산별미", "노작진성",
+        "경원해물찜", "일미아구찜", "하늘아구", "역전나그네", "인생미역"
+      ],
+      "intent_keywords": ["인생아구찜창업", "인생아구찜 창업", "인생아구찜가맹"],
+      "menu_keywords": ["살마니아구찜", "인생아구찜 알찜", "인생아구찜 해물찜"],
+      "site": "insaengaguzzim.com"
+    },
+    {
+      "id": "samdae",
+      "name": "삼대미역",
+      "datalab_keywords": ["삼대미역", "삼대 미역"],
+      "doc_query": "삼대미역",
+      "include_any": ["삼대미역"],
+      "exclude_any": ["팔도미역", "삼대기장집", "삼대째", "삼대(代)"],
+      "intent_keywords": ["삼대미역창업", "삼대미역 창업", "삼대미역가맹"],
+      "menu_keywords": ["삼대미역 미역국", "삼대미역 한우미역국"],
+      "site": "samdaemiyeok.com"
+    },
+    {
+      "id": "eohwarak",
+      "name": "어화락",
+      "datalab_keywords": ["어화락"],
+      "doc_query": "어화락",
+      "include_any": ["어화락"],
+      "exclude_any": [],
+      "intent_keywords": ["어화락창업", "어화락 창업", "어화락가맹"],
+      "menu_keywords": ["어화락 민어찜", "어화락 화덕생선구이"],
+      "site": ""
+    }
+  ],
+  "context_groups": [
+    {"id": "cat_agu",     "name": "아구찜 카테고리",   "keywords": ["아구찜", "아귀찜"]},
+    {"id": "cat_miyeok",  "name": "미역국 카테고리",   "keywords": ["미역국", "미역국집"]},
+    {"id": "cat_haemul",  "name": "해물찜 카테고리",   "keywords": ["해물찜"]},
+    {"id": "mkt_startup", "name": "외식창업 수요",     "keywords": ["외식창업", "프랜차이즈창업"]},
+    {"id": "cat_startup", "name": "아구찜창업 수요",   "keywords": ["아구찜창업", "아구찜 창업", "아구찜프랜차이즈"]}
+  ]
+}

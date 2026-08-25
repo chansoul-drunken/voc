@@ -1,0 +1,8 @@
+{
+  "_note": "이미 리포트에 실은 출처. 여기 있는 URL은 다시 싣지 않는다. 다만 후속 전개가 있으면 '후속:' 접두어를 달고 새 사실만 한 줄로 적는다. 90일 넘은 항목은 매 실행 시 삭제한다.",
+  "urls": [
+    { "url": "https://example.com/news/2026/08/21/franchise-expansion", "seen_at": "2026-08-21", "brand": "보돌미역",   "context": "출점확장" },
+    { "url": "https://example.com/blog/2026/08/23/new-menu-review",     "seen_at": "2026-08-23", "brand": "행운아구찜", "context": "마케팅 — 신메뉴 체험단" },
+    { "url": "https://example.com/news/2026/08/24/hygiene-inspection",  "seen_at": "2026-08-24", "brand": "(경쟁사)",   "context": "부정이벤트 — 위생 적발" }
+  ]
+}

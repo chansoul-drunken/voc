@@ -1,0 +1,209 @@
+{
+  "owner_email": "owner@example.com",
+  "company": "인생푸드",
+  "timezone": "Asia/Seoul",
+  "ladders": [
+    {
+      "id": "agujjim",
+      "label": "아구찜·해물찜",
+      "own": "인생아구찜",
+      "own_aliases": [
+        "인생아구찜",
+        "인생푸드 인생아구찜"
+      ],
+      "competitors": [
+        "1등아구찜",
+        "아구듬뿍알곤마니",
+        "행운아구찜",
+        "김영희아구찜",
+        "싸다아구찜",
+        "아구찜참잘하는집"
+      ],
+      "reference_only": [
+        "두찜"
+      ],
+      "_reference_only_note": "카테고리가 다른 대상. 계속 훑되 순위에는 세우지 않고 '참고 · 카테고리 다름'으로 따로 적는다. 두찜은 찜닭 프랜차이즈라 아구찜 사다리에 세우면 항상 1위가 되어 순위 자체를 무의미하게 만든다(2026-08-24 실측 50건+ vs 사다리 1위 인생아구찜 9건)."
+    },
+    {
+      "id": "miyeok",
+      "label": "미역국·한식",
+      "own": "삼대미역",
+      "own_aliases": [
+        "삼대미역",
+        "삼대미역국"
+      ],
+      "competitors": [
+        "보돌미역",
+        "서청미역",
+        "일호점미역",
+        "풍원장미역국",
+        "팔도미역"
+      ]
+    },
+    {
+      "id": "eohwarak",
+      "label": "생선구이·고등어",
+      "own": "어화락",
+      "own_aliases": [
+        "어화락"
+      ],
+      "competitors": [
+        "달빛에구운고등어",
+        "북극해고등어",
+        "고래식당",
+        "선굼터",
+        "반궁",
+        "백년고등어1750",
+        "바다를먹은고등어",
+        "산으로간고등어",
+        "화덕으로간고등어"
+      ]
+    }
+  ],
+  "risk_grades": [
+    {
+      "grade": "안정",
+      "min": 0,
+      "max": 24,
+      "color": "#2E7D32"
+    },
+    {
+      "grade": "주의",
+      "min": 25,
+      "max": 49,
+      "color": "#F9A825"
+    },
+    {
+      "grade": "경계",
+      "min": 50,
+      "max": 74,
+      "color": "#EF6C00"
+    },
+    {
+      "grade": "위험",
+      "min": 75,
+      "max": 100,
+      "color": "#C62828"
+    }
+  ],
+  "activity_categories": [
+    "출시",
+    "출점확장",
+    "제휴",
+    "마케팅",
+    "수상인증",
+    "채용가맹",
+    "연구품질"
+  ],
+  "platforms": [
+    "X",
+    "유튜브",
+    "인스타그램/Threads",
+    "뉴스",
+    "커뮤니티/블로그"
+  ],
+  "search_hints": {
+    "_doc": "브랜드명이 일반명사·동음이의어와 겹쳐 검색 노이즈가 큰 대상. 검색 시 반드시 힌트 키워드를 AND로 붙이고, 그래도 무관한 결과면 0건으로 기록한다.",
+    "고래식당": "프랜차이즈 OR 생선구이 OR 고등어 (일반 상호로 흔한 이름 — 동명 개인 식당 제외)",
+    "선굼터": "프랜차이즈 OR 생선구이 OR 가맹",
+    "반궁": "프랜차이즈 OR 생선구이 OR 고등어 OR 가맹 (한자어·게임 용어와 충돌)",
+    "두찜": "프랜차이즈 OR 가맹 (찜닭 브랜드로도 검색됨 — 실제 브랜드 확인 후 기록)",
+    "1등아구찜": "프랜차이즈 OR 가맹 OR 매장 (\"1등 아구찜\" 수식어구 오탐 주의 — 브랜드 상호로 쓰인 것만)",
+    "싸다아구찜": "프랜차이즈 OR 가맹",
+    "행운아구찜": "프랜차이즈 OR 가맹",
+    "아구찜참잘하는집": "프랜차이즈 OR 가맹",
+    "팔도미역": "프랜차이즈 OR 미역국 OR 가맹 (식품 원물 유통사와 혼동 주의)",
+    "보돌미역": "프랜차이즈 OR 미역국 OR 가맹",
+    "서청미역": "프랜차이즈 OR 미역국 OR 가맹",
+    "일호점미역": "프랜차이즈 OR 미역국 OR 가맹",
+    "백년고등어1750": "프랜차이즈 OR 가맹 OR 생선구이"
+  },
+  "voc_source": {
+    "mode": "drive_sheet",
+    "_note": "웹앱 배포는 example.com 도메인 제한으로 불가(302). VOC 마스터(voc정리)는 MASTER_VOC만으로 Drive 추출 한도를 넘겨 스냅샷이 읽기 범위 밖으로 밀려남(2026-08-20 실측) → 전용 소파일로 분리.",
+    "spreadsheet_id": "스프레드시트ID_교체하세요",
+    "spreadsheet_title": "WATCHTOWER_DATA",
+    "snapshot_sheet": "WATCHTOWER_SNAPSHOT",
+    "diag_sheet": "WATCHTOWER_DIAG",
+    "source_master": {
+      "title": "voc정리",
+      "id": "스프레드시트ID_교체하세요",
+      "_note": "원본. 커서 직접 읽지 말 것 — 추출 한도 초과."
+    },
+    "ready": true,
+    "verified_at": "2026-08-20 11:42",
+    "ready_note": "배달앱 채널 정상 가동(2026-08-20 11:42 스냅샷 검증). 네이버는 WT_EXCLUDE_PLATFORMS로 제외 — 플레이스 리뷰라 배달 맥락과 다르고, 척도 교정 사고로 137건 손상돼 미복구.",
+    "excluded_platforms": [
+      "네이버"
+    ]
+  },
+  "tools": {
+    "_note": "PlayMCP 도구함(https://playmcp.kakao.com/mcp)을 커스텀 커넥터로 연결. 실행 시 실제 존재 여부를 확인하고 없으면 AGENT.md 2-2e 폴백을 따른다.",
+    "playmcp": {
+      "네이버 검색": {
+        "tools": 18,
+        "use": [
+          "뉴스",
+          "커뮤니티·블로그",
+          "주간 랭킹 스윕"
+        ],
+        "priority": 1,
+        "connected": false
+      },
+      "YouTube Data": {
+        "tools": 15,
+        "use": [
+          "유튜브 ★ 판정",
+          "바이럴 확산 가속도 실측"
+        ],
+        "priority": 2,
+        "connected": false
+      },
+      "카카오맵": {
+        "tools": 4,
+        "use": [
+          "매장 수 추적",
+          "장소 리뷰·평점"
+        ],
+        "priority": 3,
+        "connected": false
+      },
+      "맞춤 뉴스 브리핑": {
+        "tools": 1,
+        "use": [
+          "뉴스 보조"
+        ],
+        "priority": 4,
+        "connected": false
+      },
+      "카카오톡 나챗방": {
+        "tools": 1,
+        "use": [
+          "경계 이상·급등 시 경보"
+        ],
+        "priority": 3,
+        "connected": true
+      }
+    },
+    "google": {
+      "drive": {
+        "use": [
+          "WATCHTOWER_DATA 스냅샷 읽기"
+        ],
+        "connected": false,
+        "_note": "끊기면 배달앱 채널이 2-2c 폴백으로 빠진다"
+      },
+      "gmail": {
+        "use": [
+          "리포트 발송"
+        ],
+        "connected": false,
+        "_note": "2026-08-20 사용자 결정으로 발송 보류. 파일 저장으로 대체."
+      }
+    }
+  },
+  "delivery": {
+    "mode": "file_only",
+    "_note": "메일 발송 보류(2026-08-20). reports/ 저장이 1순위이며 그것만 되면 회차 성공. Gmail 연결되면 mode를 email로 바꿀 것."
+  }
+}
