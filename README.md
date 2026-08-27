@@ -5,6 +5,8 @@
 흩어진 리뷰를 모아 하루 한 장으로 만들고, 경쟁 브랜드가 지금 무엇을 하고 있는지를 매주 같은 자로 잰다.
 공통 원칙은 하나다. **재지 못한 것을 잰 척하지 않는다.**
 
+https://chansoul-drunken.github.io/voc/skills/voc-daily-snapshot/assets/dashboard.html
+
 ---
 
 ## 어떤 업무를 대신하나
